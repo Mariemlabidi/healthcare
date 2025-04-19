@@ -1,0 +1,18 @@
+<header class="header">
+    <div class="header-container">
+      <div class="logo">
+        <span class="logo-text">We</span>
+        <span class="logo-text-bold">Care</span>
+      </div>
+      <nav class="nav">
+        <ul class="nav-list">
+          <li *ngFor="let item of navItems" class="nav-item">
+            <a [routerLink]="[item.link]" class="nav-link">{{ item.name }}</a>
+          </li>
+        </ul>
+      </nav>
+      <div class="appointment-btn">
+        <button class="btn btn-primary" [routerLink]="['appointment']">Appointment</button>
+      </div>
+    </div>
+  </header>

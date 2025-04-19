@@ -1,0 +1,183 @@
+/* specialty.component.css */
+/* Text and background colors */
+.text-navy-800 {
+  color: #1e3a8a;
+}
+
+.bg-navy-800 {
+  background-color: #1e3a8a;
+}
+
+.bg-blue-50 {
+  background-color: #eff6ff;
+}
+
+.bg-green-50 {
+  background-color: #f0fdf4;
+}
+
+.bg-red-50 {
+  background-color: #fef2f2;
+}
+
+.bg-blue-100 {
+  background-color: #dbeafe;
+}
+
+.bg-green-100 {
+  background-color: #dcfce7;
+}
+
+.bg-red-100 {
+  background-color: #fee2e2;
+}
+
+/* Container styles */
+.services-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.services-heading {
+  margin-bottom: 30px;
+}
+
+.services-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #4a5568;
+  margin-bottom: 10px;
+}
+
+.services-subtitle {
+  font-size: 30px;
+  font-weight: 700;
+  color: #1e3a8a;
+  margin-bottom: 25px;
+}
+
+/* Card layout */
+.flex {
+  display: flex;
+  gap: 20px;
+  width: 100%;
+  justify-content: space-between;
+  margin-bottom: 30px;
+}
+
+.service-card {
+  flex: 1;
+  border-radius: 10px;
+  padding: 25px;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  display: flex;
+  flex-direction: column;
+  max-width: 33%;
+}
+
+/* Icon containers */
+.icon-container {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 60px;
+  height: 60px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+}
+
+/* Card content */
+.service-card h3 {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 15px;
+  color: #1e293b;
+}
+
+.service-card p {
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+  margin-bottom: 20px;
+}
+
+/* Button styles */
+.read-more-btn {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  align-self: flex-start;
+  margin-top: auto;
+  transition: all 0.2s ease;
+}
+
+.read-more-btn:hover {
+  background-color: #1e4198;
+}
+
+/* Navigation buttons */
+.nav-buttons {
+  position: absolute;
+  right: 20px;
+  top: 40px;
+  display: flex;
+  gap: 10px;
+}
+
+.nav-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background-color: white;
+  border: 1px solid #e2e8f0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+/* Footer contact section */
+.contact-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
+  font-size: 14px;
+  color: #64748b;
+  gap: 10px;
+}
+
+.get-started-btn {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .flex {
+    flex-direction: column;
+  }
+  
+  .service-card {
+    max-width: 100%;
+    margin: 10px 0;
+  }
+  
+  .nav-buttons {
+    display: none;
+  }
+}

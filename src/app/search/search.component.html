@@ -1,0 +1,18 @@
+<section class="search">
+    <div class="search-container">
+      <h2 class="search-title">{{ searchTitle }}</h2>
+      <div class="search-form">
+        <div class="search-input-group">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" [(ngModel)]="searchQuery" placeholder="Search Doctor Here or For Advice" class="search-input">
+        </div>
+        <div class="search-input-group">
+          <i class="fas fa-map-marker-alt search-icon"></i>
+          <input type="text" [(ngModel)]="location" placeholder="Set Your Location" class="search-input">
+        </div>
+        <button class="search-button" (click)="search()">
+          <i class="fas fa-search"></i>
+        </button>
+      </div>
+    </div>
+  </section>
