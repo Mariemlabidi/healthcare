@@ -1,0 +1,29 @@
+<div class="swiper mySwiper">
+    <div class="swiper-wrapper">
+      <div class="swiper-slide" *ngFor="let service of services">
+        <div class="service-box s-box1">
+          <i class="{{service.icon}}"></i>
+          <strong>{{service.title}}</strong>
+          <p>{{service.description}}</p>
+          <a href="#">Read More</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Navigation buttons -->
+    <div class="swiper-button-next"></div>
+    <div class="swiper-button-prev"></div>
+    
+    <!-- Pagination dots -->
+    <div class="swiper-pagination"></div>
+  </div>
+
+  <!-- Contact Footer -->
+  <div class="contact-footer mt-8 p-4 text-center">
+    <p class="text-gray-500">
+      Contact Us For Need Any Help And Services 
+      <a href="#" class="bg-navy-800 text-white px-3 py-2 rounded text-sm font-medium ml-2">Let's get Started</a>
+    </p>
+  </div>
+  
+  

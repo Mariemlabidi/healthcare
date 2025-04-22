@@ -1,0 +1,145 @@
+/* Swiper container */
+.swiper {
+    width: 100%;
+    padding: 40px 0;
+  }
+  
+  /* Slide styling */
+  .swiper-slide {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  /* Navigation buttons styling */
+  .swiper-button-next,
+  .swiper-button-prev {
+    color: #1e3a8a;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: white;
+    border: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  .swiper-button-next:after,
+  .swiper-button-prev:after {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  /* Pagination dots */
+  .swiper-pagination-bullet {
+    width: 10px;
+    height: 10px;
+    background-color: #cbd5e1;
+    opacity: 1;
+  }
+  
+  .swiper-pagination-bullet-active {
+    background-color: #1e3a8a;
+  }
+  
+  /* Service box styling from your CSS */
+  .service-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: flex-start;
+    max-width: 350px;
+    border: 5px solid #ffffff;
+    padding: 30px;
+    transition: all 0.3s ease-in-out;
+  }
+  
+  .service-box:hover {
+    border: 5px solid #1e3a8a;
+  }
+    
+  .service-box i {
+    font-size: 2rem;
+    color: #122853;
+    width: 60px;
+    height: 60px;
+    border-radius: 5px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ddaae7;
+  }
+  
+  .s-box1 {
+    background-color: #ecf6fd;
+  }
+  
+  .s-box1 i {
+    background-color: #d4e2ff;
+  }
+  
+  .service-box strong {
+    color: #122853;
+    font-size: 1.4rem;
+    margin-top: 20px;
+  }
+  
+  .service-box p {
+    color: #122853;
+    font-size: 0.9rem;
+    line-height: 1.4rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+  
+  .service-box a {
+    height: 45px;
+    background-color: #122853;
+    color: #ffffff;
+    padding: 0px 20px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 0.9rem;
+    font-weight: 500;
+    border-radius: 5px;
+    margin-top: 30px;
+  }
+  
+  /* Responsive adjustments */
+  @media (max-width: 768px) {
+    .swiper-button-next,
+    .swiper-button-prev {
+      display: none;
+    }
+    
+    .service-box {
+      max-width: 100%;
+    }
+  }
+
+  /* Footer contact section */
+.contact-footer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px 0;
+  font-size: 14px;
+  color: #64748b;
+  gap: 10px;
+}
+
+.get-started-btn {
+  background-color: #1e3a8a;
+  color: white;
+  padding: 8px 15px;
+  border-radius: 5px;
+  font-weight: 600;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  margin-left: 10px;
+}

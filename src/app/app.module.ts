@@ -14,6 +14,8 @@ import { ServicesComponent } from './services/services.component';
 import { SpecialtyComponent } from './specialty/specialty.component';
 import { AppointmentFormComponent } from './appointment-form/appointment-form.component';
 import { HomeComponent } from './home/home.component';
+import { MySwiperComponent } from './my-swiper/my-swiper.component';
+import { DoctorsComponent } from './doctors/doctors.component';
 
 @NgModule({
   declarations: [
@@ -25,6 +27,8 @@ import { HomeComponent } from './home/home.component';
     SpecialtyComponent,
     AppointmentFormComponent,
     HomeComponent,
+    MySwiperComponent,
+    DoctorsComponent,
   ],
   imports: [
     BrowserModule,

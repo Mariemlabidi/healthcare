@@ -1,33 +1,46 @@
-<h2>Prendre un Rendez-vous</h2>
+<div class="appointment-container">
+  <h2>Prendre un Rendez-vous</h2>
 
-<form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()">
+  <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="form-grid">
+    <div class="form-group">
+      <label for="patientName">Nom du Patient</label>
+      <input type="text" id="patientName" formControlName="patientName">
+      <div *ngIf="appointmentForm.get('patientName')?.invalid && appointmentForm.get('patientName')?.touched" class="error-message">
+        Nom obligatoire
+      </div>
+    </div>
 
-  <label>Nom du Patient</label>
-  <input type="text" formControlName="patientName">
-  <div *ngIf="appointmentForm.get('patientName')?.invalid && appointmentForm.get('patientName')?.touched">
-    Nom obligatoire
-  </div>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input type="email" id="email" formControlName="email">
+      <div *ngIf="appointmentForm.get('email')?.invalid && appointmentForm.get('email')?.touched" class="error-message">
+        Email valide requis
+      </div>
+    </div>
 
-  <label>Email</label>
-  <input type="email" formControlName="email">
-  <div *ngIf="appointmentForm.get('email')?.invalid && appointmentForm.get('email')?.touched">
-    Email valide requis
-  </div>
+    <div class="form-group">
+      <label for="phone">Téléphone</label>
+      <input type="text" id="phone" formControlName="phone">
+      <div *ngIf="appointmentForm.get('phone')?.invalid && appointmentForm.get('phone')?.touched" class="error-message">
+        Numéro invalide
+      </div>
+    </div>
 
-  <label>Téléphone</label>
-  <input type="text" formControlName="phone">
-  <div *ngIf="appointmentForm.get('phone')?.invalid && appointmentForm.get('phone')?.touched">
-    Numéro invalide
-  </div>
+    <div class="form-group">
+      <label for="appointmentDate">Date du Rendez-vous</label>
+      <input type="date" id="appointmentDate" formControlName="appointmentDate">
+    </div>
 
-  <label>Date du Rendez-vous</label>
-  <input type="date" formControlName="appointmentDate">
+    <div class="form-group">
+      <label for="appointmentTime">Heure du Rendez-vous</label>
+      <input type="time" id="appointmentTime" formControlName="appointmentTime">
+    </div>
 
-  <label>Heure du Rendez-vous</label>
-  <input type="time" formControlName="appointmentTime">
+    <div class="form-group full-width">
+      <label for="reason">Motif du Rendez-vous</label>
+      <textarea id="reason" formControlName="reason"></textarea>
+    </div>
 
-  <label>Motif du Rendez-vous</label>
-  <textarea formControlName="reason"></textarea>
-
-  <button type="submit">Envoyer</button>
-</form>
+    <button type="submit" class="submit-btn">Envoyer</button>
+  </form>
+</div>
