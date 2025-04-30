@@ -16,6 +16,16 @@ import { AppointmentFormComponent } from './appointment-form/appointment-form.co
 import { HomeComponent } from './home/home.component';
 import { MySwiperComponent } from './my-swiper/my-swiper.component';
 import { DoctorsComponent } from './doctors/doctors.component';
+import { MapComponent } from './map/map.component';
+import { TestimonialsComponent } from './testimonials/testimonials.component';
+import { ContactComponent } from './contact/contact.component';
+import { WhyChooseUsComponent } from './why-choose-us/why-choose-us.component';
+import { LoginComponent } from './login/login.component';
+import { RegistreComponent } from './registre/registre.component';
+import { DashboardComponent } from './dashboard/dashboard.component';
+import { AuthGuard } from './auth.guard';
+
+
 
 @NgModule({
   declarations: [
@@ -29,6 +39,13 @@ import { DoctorsComponent } from './doctors/doctors.component';
     HomeComponent,
     MySwiperComponent,
     DoctorsComponent,
+    MapComponent,
+    TestimonialsComponent,
+    ContactComponent,
+    WhyChooseUsComponent,
+    LoginComponent,
+    RegistreComponent,
+    DashboardComponent 
   ],
   imports: [
     BrowserModule,
@@ -37,11 +54,16 @@ import { DoctorsComponent } from './doctors/doctors.component';
     HttpClientModule,
     RouterModule.forRoot([
       
-      { path: '', component: HomeComponent },  // Changer pour HomeComponent au lieu de AppComponent
-      // Ajouter une route pour le formulaire si nécessaire
+      { path: '', component: HomeComponent },  
       { path: 'appointment', component: AppointmentFormComponent },
-      
-      // Add more routes as needed
+      { path: 'map', component:MapComponent  },
+      { path: 'testimonial', component:TestimonialsComponent },
+      { path: 'services', component:ServicesComponent  },
+      { path: 'doctors', component:DoctorsComponent  },
+      {path:'login' , component:LoginComponent},
+      { path: 'register', component: RegistreComponent },
+        { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+
     ])
   ],
   providers: [],

@@ -1,155 +1,158 @@
-/* doctors.component.css */
 .doctors-section {
-    padding: 80px 0;
-    background-color: #f8f9fa;
-  }
-  
-  .doctors-container {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-  }
-  
-  .doctors-header {
-    text-align: center;
-    margin-bottom: 60px;
-  }
-  
-  .doctors-header h2 {
-    font-size: 36px;
-    color: #1e3a8a;
-    font-weight: 700;
-    margin-bottom: 15px;
-  }
-  
-  .doctors-header p {
-    color: #6b7280;
-    font-size: 16px;
-  }
-  
-  .doctors-grid {
-    display: flex;
-    justify-content: center;
-    flex-wrap: wrap;
-    gap: 20px;
-  }
-  
+  padding: 80px 0;
+  background-color: #f8f9fa;
+}
+
+.doctors-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.doctors-header {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.doctors-header h2 {
+  font-size: 36px;
+  color: #1e3a8a;
+  font-weight: 700;
+  margin-bottom: 15px;
+}
+
+.doctors-header p {
+  color: #6b7280;
+  font-size: 16px;
+}
+
+/* Swiper Slide Layout */
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+}
+
+.doctor-card {
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  width: 100%;
+  max-width: 260px; /* Pour avoir jusqu'à 4 cartes dans 1200px */
+  transition: all 0.3s ease;
+}
+
+.doctor-image {
+  width: 100%;
+  height: 260px;
+  overflow: hidden;
+  background-color: #f8f9fa;
+}
+
+.doctor-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: top center;
+  transition: transform 0.3s ease;
+}
+
+.doctor-card:hover .doctor-image img {
+  transform: scale(1.05);
+}
+
+.doctor-info {
+  padding: 20px;
+  text-align: center;
+  background-color: #f8f9fa;
+}
+
+.doctor-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 8px;
+}
+
+.doctor-info p {
+  font-size: 14px;
+  color: #64748b;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.button-group .btn {
+  margin-bottom: 5px;
+  width: 100%;
+  max-width: 160px;
+}
+
+.button-group .btn:last-child {
+  margin-bottom: 0;
+}
+
+/* Boutons */
+.btn {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 5px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.btn-primary {
+  background-color: #1a408d;
+  color: white;
+}
+
+.btn-primary:hover {
+  background-color: #084a9c;
+}
+
+.btn-green {
+  background-color: rgb(9, 84, 10);
+  color: white;
+}
+
+.btn-green:hover {
+  background-color: darkgreen;
+  color: white;
+}
+
+/* Swiper navigation */
+.swiper-button-next,
+.swiper-button-prev {
+  color: #1a408d;
+}
+
+.swiper-pagination-bullet-active {
+  background-color: #1a408d;
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
   .doctor-card {
-    background-color: #ffffff;
-    border-radius: 8px;
-    overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-    width: calc(25% - 20px);
-    transition: all 0.3s ease;
+    max-width: 33.33%;
   }
-  
+}
+
+@media (max-width: 992px) {
+  .doctor-card {
+    max-width: 48%;
+  }
+}
+
+@media (max-width: 768px) {
+  .doctor-card {
+    max-width: 100%;
+  }
+
   .doctor-image {
-    width: 100%;
-    height: 240px;
-    overflow: hidden;
-    background-color: #f8f9fa;
+    height: 200px;
   }
-  
-  .doctor-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-  
-  .doctor-card:hover .doctor-image img {
-    transform: scale(1.05);
-  }
-  
-  .doctor-info {
-    padding: 20px;
-    text-align: center;
-    background-color: #f8f9fa;
-  }
-  
-  .doctor-info h3 {
-    font-size: 18px;
-    font-weight: 600;
-    color: #1e293b;
-    margin-bottom: 8px;
-  }
-  
-  .doctor-info p {
-    font-size: 14px;
-    color: #64748b;
-  }
-  
-  .doctors-navigation {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    margin-top: 40px;
-  }
-  
-  .navigation-dots {
-    display: flex;
-    gap: 10px;
-  }
-  
-  .dot {
-    width: 10px;
-    height: 10px;
-    border-radius: 50%;
-    background-color: #cbd5e1;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .dot.active {
-    background-color: #1e3a8a;
-  }
-  
-  /* Responsive styles */
-  @media (max-width: 1200px) {
-    .doctor-card {
-      width: calc(33.33% - 20px);
-    }
-  }
-  
-  @media (max-width: 992px) {
-    .doctor-card {
-      width: calc(50% - 20px);
-    }
-  }
-  
-  @media (max-width: 768px) {
-    .doctors-grid {
-      display: block;
-      position: relative;
-      height: 380px; /* Hauteur fixe pour le conteneur de carrousel */
-    }
-    
-    .doctor-card {
-      width: 100%;
-      position: absolute;
-      left: 0;
-      right: 0;
-      opacity: 0;
-      visibility: hidden;
-      transition: opacity 0.5s ease, visibility 0.5s;
-    }
-    
-    .doctor-card.active {
-      opacity: 1;
-      visibility: visible;
-    }
-  }
-  
-  @media (max-width: 480px) {
-    .doctors-header h2 {
-      font-size: 28px;
-    }
-    
-    .doctors-grid {
-      height: 340px;
-    }
-    
-    .doctor-image {
-      height: 200px;
-    }
-  }
+}

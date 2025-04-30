@@ -1,0 +1,77 @@
+<div class="contact-section">
+    <h2 class="section-title">GET IN TOUCH</h2>
+    
+    <div class="contact-container">
+      <div class="form-container">
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+          <!-- Champ nom -->
+          <div class="form-group">
+            <input 
+              type="text" 
+              formControlName="name" 
+              placeholder="Name" 
+              [ngClass]="{ 'is-invalid': submitted && nameControl?.errors }"
+            >
+            <div *ngIf="submitted && nameControl?.errors" class="error-message">
+              <div *ngIf="nameControl?.errors?.['required']">Name is required</div>
+            </div>
+          </div>
+          
+          <!-- Champ téléphone -->
+          <div class="form-group">
+            <input 
+              type="tel" 
+              formControlName="phone" 
+              placeholder="Phone Number" 
+              [ngClass]="{ 'is-invalid': submitted && phoneControl?.errors }"
+            >
+            <div *ngIf="submitted && phoneControl?.errors" class="error-message">
+              <div *ngIf="phoneControl?.errors?.['required']">Phone number is required</div>
+            </div>
+          </div>
+          
+          <!-- Champ email -->
+          <div class="form-group">
+            <input 
+              type="email" 
+              formControlName="email" 
+              placeholder="Email" 
+              [ngClass]="{ 'is-invalid': submitted && emailControl?.errors }"
+            >
+            <div *ngIf="submitted && emailControl?.errors" class="error-message">
+              <div *ngIf="emailControl?.errors?.['required']">Email is required</div>
+              <div *ngIf="emailControl?.errors?.['email']">Email must be valid</div>
+            </div>
+          </div>
+          
+          <!-- Champ message -->
+          <div class="form-group">
+            <textarea 
+              formControlName="message" 
+              placeholder="Message" 
+              rows="5"
+              [ngClass]="{ 'is-invalid': submitted && messageControl?.errors }"
+            ></textarea>
+            <div *ngIf="submitted && messageControl?.errors" class="error-message">
+              <div *ngIf="messageControl?.errors?.['required']">Message is required</div>
+            </div>
+          </div>
+          
+          <!-- Bouton d'envoi -->
+          <div class="form-group">
+            <button type="submit" class="send-button">SEND</button>
+          </div>
+          
+          <!-- Message de succès -->
+          <div *ngIf="success" class="success-message">
+            Your message has been sent successfully!
+          </div>
+        </form>
+      </div>
+      
+      <div class="map-container">
+        <!-- Ici vous intégrez votre composant map existant -->
+        <app-map></app-map>
+      </div>
+    </div>
+  </div>

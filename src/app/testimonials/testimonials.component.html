@@ -1,0 +1,29 @@
+<div class="testimonial-section">
+    <h2 class="testimonial-heading">OUR TESTIMONIAL</h2>
+    
+    <div class="testimonial-container">
+      <div class="testimonial-card">
+        <div class="testimonial-header">
+          <h3 class="testimonial-name">{{ currentTestimonial.name }}</h3>
+          <p class="testimonial-subtitle">{{ currentTestimonial.subtitle }}</p>
+        </div>
+        
+        <div class="testimonial-content">
+          <p>{{ currentTestimonial.content }}</p>
+        </div>
+        
+        <div class="testimonial-quote-icon">
+          <span class="quote-mark">"</span>
+        </div>
+      </div>
+      
+      <div class="testimonial-controls">
+        <button class="control-button prev" (click)="previousTestimonial()">
+          <span class="arrow">&#60;</span>
+        </button>
+        <button class="control-button next" (click)="nextTestimonial()">
+          <span class="arrow">&#62;</span>
+        </button>
+      </div>
+    </div>
+  </div>

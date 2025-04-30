@@ -9,8 +9,8 @@ import { Component } from '@angular/core';
 export class HeaderComponent {
   logoText = 'WeCare';
   navItems = [
-    { name: 'Find A Doctor', link: '#' },
-    { name: 'Our Services', link: '#' },
-    { name: 'Testimonials', link: '#' }
+    { name: 'Find A Doctor', link: '/doctors' },
+    { name: 'Our Services', link: '/services' },
+    { name: 'Testimonials', link: '/testimonial' }
   ];
 }

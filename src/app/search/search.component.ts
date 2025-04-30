@@ -10,9 +10,18 @@ export class SearchComponent {
   searchTitle = 'Find Best HealthCare';
   searchQuery = '';
   location = '';
+  
+
+
+  
 
   search() {
     console.log('Searching for:', this.searchQuery, 'at', this.location);
     // Implement search functionality here
+    // Envoie la localisation au service
+     
+    
+    
+
   }
 }

@@ -4,7 +4,7 @@
         <h1 class="hero-heading">{{ heroHeading }}</h1>
         <p class="hero-text">{{ heroText }}</p>
         <div class="hero-buttons">
-          <button class="btn btn-blue">
+          <button class="btn btn-blue" [routerLink]="['doctors']">
             <i class="fas fa-search"></i> Find Doctor's
           </button>
           <button class="btn btn-dark-blue" [routerLink]="['appointment']">Book Appointment</button>

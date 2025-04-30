@@ -1,0 +1,98 @@
+.contact-section {
+    padding: 60px 0;
+    background-color: #fff;
+  }
+  
+  .container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 15px;
+  }
+  
+  .section-title {
+    font-size: 36px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 40px;
+  }
+  
+  .contact-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+  
+  .form-container {
+    flex: 1;
+    min-width: 300px;
+  }
+  
+  .map-container {
+    flex: 1;
+    min-width: 300px;
+    height: 500px;
+  }
+  
+  .form-group {
+    margin-bottom: 20px;
+  }
+  
+  input, textarea {
+    width: 100%;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.3s;
+  }
+  
+  input:focus, textarea:focus {
+    border-color: #01b8d3;
+  }
+  
+  .is-invalid {
+    border-color: #ff3860;
+  }
+  
+  .error-message {
+    color: #ff3860;
+    font-size: 14px;
+    margin-top: 5px;
+  }
+  
+  .success-message {
+    color: #23d160;
+    font-size: 16px;
+    margin-top: 15px;
+    text-align: center;
+  }
+  
+  .send-button {
+    background-color: #01b8d3;
+    color: white;
+    border: none;
+    padding: 15px 30px;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    text-transform: uppercase;
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .send-button:hover {
+    background-color: #018fa5;
+  }
+  
+  /* Styles responsive */
+  @media (max-width: 768px) {
+    .contact-container {
+      flex-direction: column;
+    }
+    
+    .map-container {
+      height: 400px;
+    }
+  }

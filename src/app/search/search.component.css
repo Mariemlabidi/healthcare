@@ -52,11 +52,15 @@
     border: none;
     border-radius: 5px;
     width: 50px;
+    height: 40px;
     cursor: pointer;
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-left: 10px; /* 💡 espace par rapport au champ location */
+    z-index: 10;
   }
+  
   
   .search-button:hover {
     background-color: #084a9c;

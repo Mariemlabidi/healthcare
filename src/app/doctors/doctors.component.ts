@@ -1,10 +1,15 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, AfterViewInit } from '@angular/core';
+import Swiper from 'swiper';
+import { Navigation, Pagination } from 'swiper/modules';
+
+
 
 interface Doctor {
   id: number;
   name: string;
   title: string;
   image: string;
+  address: string; 
 }
 
 @Component({
@@ -13,63 +18,83 @@ interface Doctor {
   templateUrl: './doctors.component.html',
   styleUrls: ['./doctors.component.css']
 })
-export class DoctorsComponent implements OnInit {
+export class DoctorsComponent implements AfterViewInit {
+
   doctors: Doctor[] = [
     {
       id: 1,
       name: 'Dr. Paradox Alex',
       title: 'Skin Specialist',
-      image: 'assets/images/doctor1.jpg'
+      image: 'assets/images/doctor1.jpg',
+      address: 'Clinique Pasteur, Rue Hédi Chaker, Tunis, Tunisia'
     },
     {
       id: 2,
       name: 'Dr. Paradox Alex',
       title: 'Skin Specialist',
-      image: 'assets/images/doctor2.jpg'
+      image: 'assets/images/doctor2.jpg',
+      address: 'Tunis, Tunisia'
     },
     {
       id: 3,
       name: 'Dr. Paradox Alex',
       title: 'Skin Specialist',
-      image: 'assets/images/doctor3.jpg'
+      image: 'assets/images/doctor3.jpg',
+      address: 'Tunis, Tunisia'
     },
     {
       id: 4,
       name: 'Dr. Paradox Alex',
       title: 'Skin Specialist',
-      image: 'assets/images/doctor4.jpg'
+      image: 'assets/images/doctor4.jpg',
+      address: 'Tunisia'
+    },
+    {
+      id: 5,
+      name: 'Dr. Paradox Alex',
+      title: 'Skin Specialist',
+      image: 'assets/images/doctor4.jpg',
+      address: 'Arianna'
+    },
+    {
+      id: 6,
+      name: 'Dr. Paradox Alex',
+      title: 'Skin Specialist',
+      image: 'assets/images/doctor4.jpg',
+      address: ' Marsa'
     }
   ];
 
-  currentSlide = 0;
-  totalSlides = this.doctors.length;
+  ngAfterViewInit(): void {
+    Swiper.use([Navigation, Pagination]);
+
+    const swiper = new Swiper('.mySwiper', {
+      slidesPerView: 1,
+      spaceBetween: 30,
+      loop: true,
+      pagination: {
+        el: '.swiper-pagination',
+        clickable: true
+      },
+      navigation: {
+        nextEl: '.swiper-button-next',
+        prevEl: '.swiper-button-prev'
+      },
+      breakpoints: {
+        640: {
+          slidesPerView: 1
+        },
+        768: {
+          slidesPerView: 2
+        },
+        1024: {
+          slidesPerView: 3
+        }
+      }
+    });
+  }
+
+
+
   
-  constructor() { }
-
-  ngOnInit(): void {
-    // Vous pouvez ajouter un carrousel automatique ici si souhaité
-    // this.startAutoSlide();
-  }
-
-  // Méthode pour aller à une diapositive spécifique
-  goToSlide(index: number): void {
-    this.currentSlide = index;
-  }
-
-  // Méthode pour aller à la diapositive suivante
-  nextSlide(): void {
-    this.currentSlide = (this.currentSlide + 1) % this.totalSlides;
-  }
-
-  // Méthode pour aller à la diapositive précédente
-  prevSlide(): void {
-    this.currentSlide = (this.currentSlide - 1 + this.totalSlides) % this.totalSlides;
-  }
-
-  // Méthode optionnelle pour lancer le défilement automatique
-  startAutoSlide(): void {
-    setInterval(() => {
-      this.nextSlide();
-    }, 5000); // Change de diapositive toutes les 5 secondes
-  }
 }

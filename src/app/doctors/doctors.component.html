@@ -1,31 +1,38 @@
+<!-- Link Swiper's CSS (à garder dans index.html idéalement) -->
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swiper@11/swiper-bundle.min.css" />
+
 <section class="doctors-section">
-    <div class="doctors-container">
-      <div class="doctors-header">
-        <h2>Meet Our Specialist</h2>
-        <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
-      </div>
-      
-      <div class="doctors-grid">
-        <div class="doctor-card" *ngFor="let doctor of doctors; let i = index" [class.active]="i === currentSlide">
-          <div class="doctor-image">
-            <img [src]="doctor.image" [alt]="doctor.name">
-          </div>
-          <div class="doctor-info">
-            <h3>{{ doctor.name }}</h3>
-            <p>{{ doctor.title }}</p>
-          </div>
-        </div>
-      </div>
-      
-      <div class="doctors-navigation">
-        <div class="navigation-dots">
-          <span 
-            *ngFor="let doctor of doctors; let i = index" 
-            class="dot" 
-            [class.active]="i === currentSlide"
-            (click)="goToSlide(i)">
-          </span>
-        </div>
-      </div>
+  <div class="doctors-container">
+    <div class="doctors-header">
+      <h2>Meet Our Specialist</h2>
+      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit.</p>
     </div>
-  </section>
+
+    <!-- Swiper Container -->
+    <div class="swiper mySwiper">
+      <div class="swiper-wrapper">
+        <div class="swiper-slide" *ngFor="let doctor of doctors">
+          <div class="doctor-card">
+            <div class="doctor-image">
+              <img [src]="doctor.image" [alt]="doctor.name">
+            </div>
+            <div class="doctor-info">
+              <h3>{{ doctor.name }}</h3>
+              <p>{{ doctor.title }}</p>
+              <div class="button-group">
+                <button class="btn btn-primary" [routerLink]="['appointment']">Appointment</button>
+                <button class="btn btn-primary btn-green" [routerLink]="['/map']" [queryParams]="{ location: doctor.address }">Adress</button>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Swiper pagination & navigation -->
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-next"></div>
+      <div class="swiper-button-prev"></div>
+    </div>
+  </div>
+</section>
