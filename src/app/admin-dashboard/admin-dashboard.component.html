@@ -1,0 +1,91 @@
+<div class="dashboard-container">
+  <h1 class="dashboard-title">Tableau de Bord Administrateur</h1>
+
+  <!-- Stats overview cards -->
+  <div class="stats-cards">
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-user-md"></i>
+      </div>
+      <div class="stat-details">
+        <h3>Médecins</h3>
+        <p class="stat-number">{{stats.totalDoctors}}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-users"></i>
+      </div>
+      <div class="stat-details">
+        <h3>Patients</h3>
+        <p class="stat-number">{{stats.totalPatients}}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-calendar-check"></i>
+      </div>
+      <div class="stat-details">
+        <h3>Total Rendez-vous</h3>
+        <p class="stat-number">{{stats.totalAppointments}}</p>
+      </div>
+    </div>
+
+    <div class="stat-card">
+      <div class="stat-icon">
+        <i class="fas fa-calendar-day"></i>
+      </div>
+      <div class="stat-details">
+        <h3>Aujourd'hui</h3>
+        <p class="stat-number">{{stats.appointmentsToday}}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main content with charts -->
+  <div class="charts-container">
+    <!-- Loading spinner -->
+    <div class="loading-container" *ngIf="loading">
+      <div class="spinner"></div>
+      <p>Chargement des données...</p>
+    </div>
+
+    <div class="charts-grid" *ngIf="!loading">
+      <!-- Doctor chart section -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h2>Rendez-vous par jour (Médecin)</h2>
+          <div class="select-container">
+            <select #doctorSelect (change)="selectDoctor(doctorSelect.value)" class="custom-select">
+              <option *ngFor="let doctor of doctors; let i = index" [value]="i">
+                {{ doctor.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="doctorChart"></canvas>
+        </div>
+      </div>
+
+      <!-- Patient chart section -->
+      <div class="chart-section">
+        <div class="chart-header">
+          <h2>Rendez-vous par mois (Patient)</h2>
+          <div class="select-container">
+            <select #patientSelect (change)="selectPatient(patientSelect.value)" class="custom-select">
+              <option *ngFor="let patient of patients; let i = index" [value]="i">
+                {{ patient.name }}
+              </option>
+            </select>
+          </div>
+        </div>
+        <div class="chart-wrapper">
+          <canvas id="patientChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -10,7 +10,7 @@ import { AppComponent } from './app.component';
 import { HeaderComponent } from './header/header.component';
 import { HeroComponent } from './hero/hero.component';
 import { SearchComponent } from './search/search.component';
-import { ServicesComponent } from './services/services.component';
+import { ServicesComponent } from './provided-services/services.component';
 import { SpecialtyComponent } from './specialty/specialty.component';
 import { AppointmentFormComponent } from './appointment-form/appointment-form.component';
 import { HomeComponent } from './home/home.component';
@@ -21,9 +21,17 @@ import { TestimonialsComponent } from './testimonials/testimonials.component';
 import { ContactComponent } from './contact/contact.component';
 import { WhyChooseUsComponent } from './why-choose-us/why-choose-us.component';
 import { LoginComponent } from './login/login.component';
-import { RegistreComponent } from './registre/registre.component';
-import { DashboardComponent } from './dashboard/dashboard.component';
+import { RegisterComponent } from './register/register.component';
+
 import { AuthGuard } from './auth.guard';
+
+import { AngularFireModule } from '@angular/fire/compat';
+import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
+import { environment } from '../environments/environment';
+import { AdminDoctorsComponent } from './admin-doctors/admin-doctors.component';
+import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+
+
 
 
 
@@ -44,11 +52,17 @@ import { AuthGuard } from './auth.guard';
     ContactComponent,
     WhyChooseUsComponent,
     LoginComponent,
-    RegistreComponent,
-    DashboardComponent 
+    RegisterComponent,
+    AdminDoctorsComponent,
+    AdminDashboardComponent,
+  
+  
   ],
   imports: [
+    
     BrowserModule,
+    AngularFireModule.initializeApp(environment.firebaseConfig),
+    AngularFirestoreModule,
     FormsModule,
     ReactiveFormsModule,
     HttpClientModule,
@@ -61,8 +75,10 @@ import { AuthGuard } from './auth.guard';
       { path: 'services', component:ServicesComponent  },
       { path: 'doctors', component:DoctorsComponent  },
       {path:'login' , component:LoginComponent},
-      { path: 'register', component: RegistreComponent },
-        { path: 'dashboard', component: DashboardComponent, canActivate: [AuthGuard] },
+      { path: 'register', component: RegisterComponent },
+      {path:'admin-doctors',component:AdminDoctorsComponent},
+      {path:'admin-dashboard' , component:AdminDashboardComponent},
+      
 
     ])
   ],

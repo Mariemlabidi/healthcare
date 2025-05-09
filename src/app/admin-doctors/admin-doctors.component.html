@@ -1,0 +1,161 @@
+
+<div class="admin-doctors-container">
+    <div class="header d-flex justify-content-between align-items-center mb-4">
+      <h2>Gestion des médecins</h2>
+      <div class="actions">
+        <div class="input-group me-2">
+          <input 
+            type="text" 
+            class="form-control" 
+            placeholder="Rechercher un médecin..." 
+            [(ngModel)]="searchTerm"
+          >
+          <button class="btn btn-outline-secondary" type="button">
+            <i class="bi bi-search"></i>
+          </button>
+        </div>
+        <button class="btn btn-primary" (click)="openModal(doctorModal)">
+          <i class="bi bi-plus-circle me-1"></i> Ajouter un médecin
+        </button>
+      </div>
+    </div>
+  
+    <!-- Tableau des médecins -->
+    <div class="table-responsive">
+      <table class="table table-striped table-hover">
+        <thead class="table-dark">
+          <tr>
+            <th scope="col">ID</th>
+            <th scope="col">Image</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Spécialité</th>
+            <th scope="col">Adresse</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <ng-container *ngIf="!isLoading && filteredDoctors.length > 0; else noData">
+            <tr *ngFor="let doctor of filteredDoctors">
+              <td>{{ doctor.id }}</td>
+              <td>
+                <img [src]="doctor.image" alt="{{ doctor.name }}" class="doctor-thumbnail">
+              </td>
+              <td>{{ doctor.name }}</td>
+              <td>{{ doctor.title }}</td>
+              <td>{{ doctor.address }}</td>
+              <td>
+                <div class="d-flex">
+                  <button class="btn btn-sm btn-primary me-2" (click)="openModal(doctorModal, doctor)">edit
+                    <i class="bi bi-pencil"></i>
+                  </button>
+                  <button class="btn btn-sm btn-danger" (click)="deleteDoctor(doctor)" >delete
+                    <i class="bi bi-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </ng-container>
+          <ng-template #noData>
+            <tr *ngIf="!isLoading">
+              <td colspan="6" class="text-center py-3">
+                <p *ngIf="doctors.length === 0">Aucun médecin trouvé dans la base de données.</p>
+                <p *ngIf="doctors.length > 0">Aucun médecin ne correspond à votre recherche.</p>
+              </td>
+            </tr>
+          </ng-template>
+        </tbody>
+      </table>
+    </div>
+  
+    <!-- Indicateur de chargement -->
+    <div *ngIf="isLoading" class="text-center my-4">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+      <p class="mt-2">Chargement des données...</p>
+    </div>
+  </div>
+  
+  <!-- Modal pour ajouter/modifier un médecin -->
+  <ng-template #doctorModal let-modal>
+    <div class="modal-header">
+      <h4 class="modal-title" id="modal-title">{{ isEditing ? 'Modifier le médecin' : 'Ajouter un médecin' }}</h4>
+      <button type="button" class="btn-close" aria-label="Close" (click)="modal.dismiss()"></button>
+    </div>
+    <div class="modal-body">
+      <form [formGroup]="doctorForm" (ngSubmit)="saveDoctor()">
+        <div class="mb-3">
+          <label for="name" class="form-label">Nom complet *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="name" 
+            formControlName="name" 
+            placeholder="Dr. Nom Prénom"
+          >
+          <div *ngIf="doctorForm.get('name')?.invalid && doctorForm.get('name')?.touched" class="text-danger">
+            <small *ngIf="doctorForm.get('name')?.errors?.['required']">Le nom est requis.</small>
+            <small *ngIf="doctorForm.get('name')?.errors?.['minlength']">Le nom doit contenir au moins 3 caractères.</small>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="title" class="form-label">Spécialité *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="title" 
+            formControlName="title" 
+            placeholder="Dermatologue, Cardiologue, etc."
+          >
+          <div *ngIf="doctorForm.get('title')?.invalid && doctorForm.get('title')?.touched" class="text-danger">
+            <small *ngIf="doctorForm.get('title')?.errors?.['required']">La spécialité est requise.</small>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="address" class="form-label">Adresse *</label>
+          <input 
+            type="text" 
+            class="form-control" 
+            id="address" 
+            formControlName="address" 
+            placeholder="Clinique, Rue, Ville, Pays"
+          >
+          <div *ngIf="doctorForm.get('address')?.invalid && doctorForm.get('address')?.touched" class="text-danger">
+            <small *ngIf="doctorForm.get('address')?.errors?.['required']">L'adresse est requise.</small>
+          </div>
+        </div>
+        
+        <div class="mb-3">
+          <label for="image" class="form-label">Photo</label>
+          <input 
+            type="file" 
+            class="form-control" 
+            id="image" 
+            (change)="onFileSelected($event)" 
+            accept="image/*"
+          >
+          <small class="form-text text-muted">Format recommandé: JPG, PNG. Taille max: 2MB</small>
+        </div>
+        
+        <!-- Prévisualisation de l'image -->
+        <div *ngIf="imagePreview" class="mb-3 text-center">
+          <p>Aperçu:</p>
+          <img [src]="imagePreview" alt="Aperçu" class="img-preview">
+        </div>
+      </form>
+    </div>
+    <div class="modal-footer">
+      <button type="button" class="btn btn-secondary" (click)="modal.dismiss()">Annuler</button>
+      <button 
+        type="button" 
+        class="btn btn-primary" 
+        [disabled]="doctorForm.invalid || isLoading" 
+        (click)="saveDoctor()"
+      >
+        <span *ngIf="isLoading" class="spinner-border spinner-border-sm me-1" role="status" aria-hidden="true"></span>
+        {{ isEditing ? 'Mettre à jour' : 'Ajouter' }}
+      </button>
+    </div>
+  </ng-template>

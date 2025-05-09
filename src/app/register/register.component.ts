@@ -1,25 +1,28 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Router, ActivatedRoute } from '@angular/router';
+import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
-import { LoginRequest } from '../../models/user.model';
+import { RegisterRequest } from '../../models/user.model';
 
 @Component({
-  selector: 'app-login',
-  templateUrl: './login.component.html',
+  selector: 'app-register',
   standalone:false,
-  styleUrls: ['./login.component.css']
+  templateUrl: './register.component.html',
+  styleUrls: ['./register.component.css']
 })
-export class LoginComponent implements OnInit {
-  loginForm: FormGroup;
+export class RegisterComponent implements OnInit {
+  registerForm: FormGroup;
   loading = false;
   submitted = false;
   error = '';
-  returnUrl: string;
+  roles = [
+    { value: 'client', label: 'Client' },
+    { value: 'medecin', label: 'Médecin' },
+    { value: 'admin', label: 'Administrateur' }
+  ];
 
   constructor(
     private formBuilder: FormBuilder,
-    private route: ActivatedRoute,
     private router: Router,
     private authService: AuthService
   ) {
@@ -28,41 +31,43 @@ export class LoginComponent implements OnInit {
       this.redirectBasedOnRole();
     }
     
-    this.loginForm = this.formBuilder.group({
+    this.registerForm = this.formBuilder.group({
+      name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
+      role: ['client', Validators.required]
     });
-    
-    this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
   ngOnInit(): void {}
 
   // Getter pour accéder facilement aux champs du formulaire
-  get f() { return this.loginForm.controls; }
+  get f() { return this.registerForm.controls; }
 
   onSubmit(): void {
     this.submitted = true;
 
     // Arrêter ici si le formulaire est invalide
-    if (this.loginForm.invalid) {
+    if (this.registerForm.invalid) {
       return;
     }
 
     this.loading = true;
     
-    const loginData: LoginRequest = {
+    const registerData: RegisterRequest = {
+      name: this.f['name'].value,
       email: this.f['email'].value,
-      password: this.f['password'].value
+      password: this.f['password'].value,
+      role: this.f['role'].value
     };
 
-    this.authService.login(loginData)
+    this.authService.register(registerData)
       .subscribe({
         next: () => {
           this.redirectBasedOnRole();
         },
         error: error => {
-          this.error = error.error?.message || 'Une erreur est survenue lors de la connexion';
+          this.error = error.error?.message || 'Une erreur est survenue lors de l\'inscription';
           this.loading = false;
         }
       });
@@ -74,7 +79,7 @@ export class LoginComponent implements OnInit {
     if (user) {
       switch (user.role) {
         case 'admin':
-          this.router.navigate(['/admin-dashboard']);
+          this.router.navigate(['/admin-doctors']);
           break;
         case 'medecin':
           this.router.navigate(['/medecin-dashboard']);
