@@ -1,11 +1,10 @@
-import { Component, AfterViewInit } from '@angular/core';
+import { Component, AfterViewInit, OnInit } from '@angular/core';
 import Swiper from 'swiper';
 import { Navigation, Pagination } from 'swiper/modules';
-
-
+import { HttpClient } from '@angular/common/http';
 
 interface Doctor {
-  id: number;
+  _id: string;
   name: string;
   title: string;
   image: string;
@@ -18,54 +17,43 @@ interface Doctor {
   templateUrl: './doctors.component.html',
   styleUrls: ['./doctors.component.css']
 })
-export class DoctorsComponent implements AfterViewInit {
+export class DoctorsComponent implements OnInit, AfterViewInit {
 
-  doctors: Doctor[] = [
-    {
-      id: 1,
-      name: 'Dr. Paradox Alex',
-      title: 'Skin Specialist',
-      image: 'assets/images/doctor1.jpg',
-      address: 'Clinique Pasteur, Rue Hédi Chaker, Tunis, Tunisia'
-    },
-    {
-      id: 2,
-      name: 'Dr. Paradox Alex',
-      title: 'Skin Specialist',
-      image: 'assets/images/doctor2.jpg',
-      address: 'Tunis, Tunisia'
-    },
-    {
-      id: 3,
-      name: 'Dr. Paradox Alex',
-      title: 'Skin Specialist',
-      image: 'assets/images/doctor3.jpg',
-      address: 'Tunis, Tunisia'
-    },
-    {
-      id: 4,
-      name: 'Dr. Paradox Alex',
-      title: 'Skin Specialist',
-      image: 'assets/images/doctor4.jpg',
-      address: 'Tunisia'
-    },
-    {
-      id: 5,
-      name: 'Dr. Paradox Alex',
-      title: 'Skin Specialist',
-      image: 'assets/images/doctor4.jpg',
-      address: 'Arianna'
-    },
-    {
-      id: 6,
-      name: 'Dr. Paradox Alex',
-      title: 'Skin Specialist',
-      image: 'assets/images/doctor4.jpg',
-      address: ' Marsa'
-    }
-  ];
+  doctors: Doctor[] = [];
+  loading: boolean = true;
+  error: string | null = null;
+  
+ 
+  private apiUrl = 'http://localhost:5000/api/doctors'; 
 
-  ngAfterViewInit(): void {
+  constructor(private http: HttpClient) {}
+
+  ngOnInit(): void {
+    this.fetchDoctors();
+  }
+
+  fetchDoctors(): void {
+    this.loading = true;
+    this.http.get<Doctor[]>(this.apiUrl)
+      .subscribe({
+        next: (data) => {
+          this.doctors = data;
+          this.loading = false;
+          
+          // Si le swiper est déjà initialisé, on le met à jour
+          setTimeout(() => {
+            this.initSwiper();
+          }, 100);
+        },
+        error: (err) => {
+          console.error('Erreur lors de la récupération des médecins:', err);
+          this.error = 'Impossible de charger la liste des médecins.';
+          this.loading = false;
+        }
+      });
+  }
+
+  initSwiper(): void {
     Swiper.use([Navigation, Pagination]);
 
     const swiper = new Swiper('.mySwiper', {
@@ -94,7 +82,10 @@ export class DoctorsComponent implements AfterViewInit {
     });
   }
 
-
-
-  
+  ngAfterViewInit(): void {
+    // Si les données sont déjà chargées, on initialise Swiper
+    if (!this.loading && this.doctors.length > 0) {
+      this.initSwiper();
+    }
+  }
 }

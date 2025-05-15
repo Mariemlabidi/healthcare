@@ -1,180 +1,106 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of } from 'rxjs';
-
-interface Doctor {
-  id: string;
-  name: string;
-  appointmentsPerDay: { date: string; count: number }[];
-}
-
-interface Patient {
-  id: string;
-  name: string;
-  appointmentsPerMonth: { month: string; count: number }[];
-}
-
-interface Stats {
-  totalDoctors: number;
-  totalPatients: number;
-  totalAppointments: number;
-  appointmentsToday: number;
-}
-
-interface DoctorAppointment {
-  date: string; 
-  count: number;
-}
-
-interface PatientAppointment {
-  month: string;
-  count: number;
-}
+import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
+import { Observable, throwError } from 'rxjs';
+import { catchError, tap } from 'rxjs/operators';
+import { Doctor, Patient, Stats } from '../models/dashboard.model';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class DashboardService {
-  private apiUrl = 'api';  // Base URL de votre API
+  private baseUrl = environment.apiUrl;
 
-  // Données fictives pour les tests
-  private mockStats: Stats = {
-    totalDoctors: 12,
-    totalPatients: 243,
-    totalAppointments: 567,
-    appointmentsToday: 24
-  };
+  constructor(private http: HttpClient) {
+    console.log('DashboardService initialized with baseUrl:', this.baseUrl);
+  }
 
-  private mockDoctors: Doctor[] = [
-    {
-      id: '1',
-      name: 'Dr. Smith',
-      appointmentsPerDay: []
-    },
-    {
-      id: '2',
-      name: 'Dr. Johnson',
-      appointmentsPerDay: []
-    },
-    {
-      id: '3',
-      name: 'Dr. Williams',
-      appointmentsPerDay: []
+  // Fonction utilitaire pour gérer les erreurs HTTP
+  private handleError(error: HttpErrorResponse) {
+    let errorMessage = '';
+    if (error.error instanceof ErrorEvent) {
+      // Erreur côté client
+      errorMessage = `Erreur: ${error.error.message}`;
+    } else {
+      // Erreur côté serveur
+      errorMessage = `Code d'erreur: ${error.status}, Message: ${error.message}`;
     }
-  ];
+    console.error(errorMessage);
+    return throwError(() => new Error(errorMessage));
+  }
 
-  private mockPatients: Patient[] = [
-    {
-      id: '1',
-      name: 'John Doe',
-      appointmentsPerMonth: []
-    },
-    {
-      id: '2',
-      name: 'Jane Smith',
-      appointmentsPerMonth: []
-    },
-    {
-      id: '3',
-      name: 'Robert Brown',
-      appointmentsPerMonth: []
-    }
-  ];
+  // Options HTTP avec en-têtes
+  private getHttpOptions() {
+    const token = localStorage.getItem('token');
+    return {
+      headers: new HttpHeaders({
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      })
+    };
+  }
 
-  // Utilisation de Map pour les rendez-vous des médecins
-  private mockDoctorAppointments = new Map<string, DoctorAppointment[]>([
-    ['1', [
-      { date: '2025-05-01', count: 5 },
-      { date: '2025-05-02', count: 3 },
-      { date: '2025-05-03', count: 7 },
-      { date: '2025-05-04', count: 2 },
-      { date: '2025-05-05', count: 4 }
-    ]],
-    ['2', [
-      { date: '2025-05-01', count: 4 },
-      { date: '2025-05-02', count: 6 },
-      { date: '2025-05-03', count: 2 },
-      { date: '2025-05-04', count: 5 },
-      { date: '2025-05-05', count: 3 }
-    ]],
-    ['3', [
-      { date: '2025-05-01', count: 6 },
-      { date: '2025-05-02', count: 4 },
-      { date: '2025-05-03', count: 5 },
-      { date: '2025-05-04', count: 3 },
-      { date: '2025-05-05', count: 7 }
-    ]]
-  ]);
-
-  // Utilisation de Map pour les rendez-vous des patients
-  private mockPatientAppointments = new Map<string, PatientAppointment[]>([
-    ['1', [
-      { month: 'Jan', count: 1 },
-      { month: 'Feb', count: 2 },
-      { month: 'Mar', count: 0 },
-      { month: 'Apr', count: 1 },
-      { month: 'May', count: 3 }
-    ]],
-    ['2', [
-      { month: 'Jan', count: 2 },
-      { month: 'Feb', count: 1 },
-      { month: 'Mar', count: 2 },
-      { month: 'Apr', count: 3 },
-      { month: 'May', count: 1 }
-    ]],
-    ['3', [
-      { month: 'Jan', count: 0 },
-      { month: 'Feb', count: 1 },
-      { month: 'Mar', count: 1 },
-      { month: 'Apr', count: 2 },
-      { month: 'May', count: 2 }
-    ]]
-  ]);
-
-  constructor(private http: HttpClient) { }
-
-  // Récupérer les statistiques générales
+  // Récupère les statistiques générales
   getStats(): Observable<Stats> {
-    // Pour un environnement de production, utilisez:
-    // return this.http.get<Stats>(`${this.apiUrl}/stats`);
-    
-    // Pour les tests, retournez les données fictives
-    return of(this.mockStats);
+    console.log('Calling getStats API:', `${this.baseUrl}/dashboard/stats`);
+    return this.http.get<Stats>(`${this.baseUrl}/dashboard/stats`, this.getHttpOptions())
+      .pipe(
+        tap(response => console.log('Stats API response:', response)),
+        catchError(this.handleError)
+      );
   }
 
-  // Récupérer la liste des médecins
+  // Récupère la liste des médecins
   getDoctors(): Observable<Doctor[]> {
-    // Pour un environnement de production, utilisez:
-    // return this.http.get<Doctor[]>(`${this.apiUrl}/doctors`);
-    
-    // Pour les tests, retournez les données fictives
-    return of(this.mockDoctors);
+    console.log('Calling getDoctors API:', `${this.baseUrl}/dashboard/doctors`);
+    return this.http.get<Doctor[]>(`${this.baseUrl}/dashboard/doctors`, this.getHttpOptions())
+      .pipe(
+        tap(response => {
+          console.log('Doctors API response:', response);
+          if (!Array.isArray(response)) {
+            console.warn('La réponse API des médecins n\'est pas un tableau:', response);
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  // Récupérer la liste des patients
+  // Récupère la liste des patients
   getPatients(): Observable<Patient[]> {
-    // Pour un environnement de production, utilisez:
-    // return this.http.get<Patient[]>(`${this.apiUrl}/patients`);
-    
-    // Pour les tests, retournez les données fictives
-    return of(this.mockPatients);
+    console.log('Calling getPatients API:', `${this.baseUrl}/dashboard/patients`);
+    return this.http.get<Patient[]>(`${this.baseUrl}/dashboard/patients`, this.getHttpOptions())
+      .pipe(
+        tap(response => {
+          console.log('Patients API response:', response);
+          if (!Array.isArray(response)) {
+            console.warn('La réponse API des patients n\'est pas un tableau:', response);
+          }
+        }),
+        catchError(this.handleError)
+      );
   }
 
-  // Récupérer les rendez-vous d'un médecin spécifique
-  getDoctorAppointments(doctorId: string): Observable<DoctorAppointment[]> {
-    // Pour un environnement de production, utilisez:
-    // return this.http.get<DoctorAppointment[]>(`${this.apiUrl}/doctors/${doctorId}/appointments`);
-    
-    // Pour les tests, retournez les données fictives
-    return of(this.mockDoctorAppointments.get(doctorId) || []);
+  // Récupère les rendez-vous pour un médecin spécifique
+  getDoctorAppointments(doctorId: string): Observable<{ date: string, count: number }[]> {
+    console.log('Calling getDoctorAppointments API:', `${this.baseUrl}/dashboard/doctor/${doctorId}/appointments`);
+    return this.http.get<{ date: string, count: number }[]>(
+      `${this.baseUrl}/dashboard/doctor/${doctorId}/appointments`, 
+      this.getHttpOptions()
+    ).pipe(
+      tap(response => console.log('Doctor appointments API response:', response)),
+      catchError(this.handleError)
+    );
   }
 
-  // Récupérer les rendez-vous d'un patient spécifique
-  getPatientAppointments(patientId: string): Observable<PatientAppointment[]> {
-    // Pour un environnement de production, utilisez:
-    // return this.http.get<PatientAppointment[]>(`${this.apiUrl}/patients/${patientId}/appointments`);
-    
-    // Pour les tests, retournez les données fictives
-    return of(this.mockPatientAppointments.get(patientId) || []);
+  // Récupère les rendez-vous pour un patient spécifique
+  getPatientAppointments(patientId: string): Observable<{ month: string, count: number }[]> {
+    console.log('Calling getPatientAppointments API:', `${this.baseUrl}/dashboard/patient/${patientId}/appointments`);
+    return this.http.get<{ month: string, count: number }[]>(
+      `${this.baseUrl}/dashboard/patient/${patientId}/appointments`, 
+      this.getHttpOptions()
+    ).pipe(
+      tap(response => console.log('Patient appointments API response:', response)),
+      catchError(this.handleError)
+    );
   }
 }

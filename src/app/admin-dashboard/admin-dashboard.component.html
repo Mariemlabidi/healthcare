@@ -1,6 +1,13 @@
 <div class="dashboard-container">
   <h1 class="dashboard-title">Tableau de Bord Administrateur</h1>
 
+  <div class="user-actions" *ngIf="currentUser">
+      <span class="welcome-user">Bienvenue, {{ currentUser.name }}</span>
+      <button class="logout-btn" (click)="logout()">
+        <i class="fas fa-sign-out-alt"></i> Déconnexion
+      </button>
+    </div>
+  
   <!-- Stats overview cards -->
   <div class="stats-cards">
     <div class="stat-card">
@@ -68,6 +75,10 @@
         <div class="chart-wrapper">
           <canvas id="doctorChart"></canvas>
         </div>
+        <div *ngIf="doctors.length === 0" class="no-data-alert">
+          <i class="fas fa-exclamation-circle"></i>
+          <p>Aucun médecin trouvé dans la base de données.</p>
+        </div>
       </div>
 
       <!-- Patient chart section -->
@@ -84,6 +95,32 @@
         </div>
         <div class="chart-wrapper">
           <canvas id="patientChart"></canvas>
+        </div>
+        <div *ngIf="patients.length === 0" class="no-data-alert">
+          <i class="fas fa-exclamation-circle"></i>
+          <p>Aucun patient trouvé dans la base de données.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Section de débogage temporaire (à supprimer après résolution) -->
+  <div class="debug-section" *ngIf="!loading">
+    <div class="debug-card">
+      <h3><i class="fas fa-bug"></i> Informations de débogage</h3>
+      <div class="debug-content">
+        <p><strong>Médecins chargés:</strong> {{doctors.length}}</p>
+        <div *ngIf="doctors.length > 0">
+          <h4>Liste des médecins:</h4>
+          <ul class="debug-list">
+            <li *ngFor="let doctor of doctors">
+              ID: {{doctor.id}} - Nom: {{doctor.name}}
+            </li>
+          </ul>
+        </div>
+        <div *ngIf="doctors.length === 0" class="debug-warning">
+          <p><strong>Attention:</strong> Aucun médecin n'a été trouvé.</p>
+          <p>Vérifiez la console du navigateur et du serveur pour les erreurs potentielles.</p>
         </div>
       </div>
     </div>

@@ -7,7 +7,7 @@ import { LoginRequest } from '../../models/user.model';
 @Component({
   selector: 'app-login',
   templateUrl: './login.component.html',
-  standalone:false,
+  standalone: false,
   styleUrls: ['./login.component.css']
 })
 export class LoginComponent implements OnInit {
@@ -23,11 +23,6 @@ export class LoginComponent implements OnInit {
     private router: Router,
     private authService: AuthService
   ) {
-    // Rediriger vers la page d'accueil si déjà connecté
-    if (this.authService.isLoggedIn()) {
-      this.redirectBasedOnRole();
-    }
-    
     this.loginForm = this.formBuilder.group({
       email: ['', [Validators.required, Validators.email]],
       password: ['', [Validators.required, Validators.minLength(6)]]
@@ -36,7 +31,11 @@ export class LoginComponent implements OnInit {
     this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
-  ngOnInit(): void {}
+  ngOnInit(): void {
+    // S'assurer que l'utilisateur est déconnecté lorsqu'il visite la page de login
+    // Cette approche est optionnelle mais résout le problème original
+    this.authService.manualLogout();
+  }
 
   // Getter pour accéder facilement aux champs du formulaire
   get f() { return this.loginForm.controls; }
@@ -80,7 +79,7 @@ export class LoginComponent implements OnInit {
           this.router.navigate(['/medecin-dashboard']);
           break;
         case 'client':
-          this.router.navigate(['/client-dashboard']);
+          this.router.navigate(['']);
           break;
         default:
           this.router.navigate(['/']);

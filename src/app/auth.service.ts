@@ -1,8 +1,8 @@
 // src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, BehaviorSubject } from 'rxjs';
-import { map, tap } from 'rxjs/operators';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
+import { map, tap, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
 import { 
   User, 
@@ -34,6 +34,13 @@ export class AuthService {
     
     this.currentUser = this.currentUserSubject.asObservable();
     this.token = this.tokenSubject.asObservable();
+    
+    // Vérifier la validité du token au démarrage de l'application
+    if (storedToken) {
+      this.verifyToken().subscribe({
+        error: () => this.clearSession()
+      });
+    }
   }
 
   // Getter pour accéder facilement à la valeur currentUser
@@ -52,13 +59,7 @@ export class AuthService {
       .pipe(
         tap((res: AuthResponse) => {
           if (res.success && res.data && res.token) {
-            // Stocker les détails de l'utilisateur et le token
-            localStorage.setItem('currentUser', JSON.stringify(res.data));
-            localStorage.setItem('token', res.token);
-            
-            // Mettre à jour les Subjects
-            this.currentUserSubject.next(res.data);
-            this.tokenSubject.next(res.token);
+            this.setSession(res.data, res.token);
           }
         })
       );
@@ -70,43 +71,74 @@ export class AuthService {
       .pipe(
         tap((res: AuthResponse) => {
           if (res.success && res.data && res.token) {
-            // Stocker les détails de l'utilisateur et le token
-            localStorage.setItem('currentUser', JSON.stringify(res.data));
-            localStorage.setItem('token', res.token);
-            
-            // Mettre à jour les Subjects
-            this.currentUserSubject.next(res.data);
-            this.tokenSubject.next(res.token);
+            this.setSession(res.data, res.token);
           }
         })
       );
   }
 
+  // Vérifier la validité du token
+ verifyToken(): Observable<any> {
+  const token = this.tokenValue;
+
+  if (!token) {
+    return throwError(() => new Error('Aucun token disponible'));
+  }
+
+  const headers = {
+    Authorization: `Bearer ${token}`
+  };
+
+  return this.http.get<any>(`${this.apiUrl}/verify-token`, { headers });
+}
+
+
   // Déconnecter un utilisateur
   logout(): Observable<any> {
+    // Envoyer une requête de déconnexion au serveur
     return this.http.get<any>(`${this.apiUrl}/logout`)
       .pipe(
-        tap(() => {
-          // Supprimer les données du stockage local
-          localStorage.removeItem('currentUser');
-          localStorage.removeItem('token');
-          
-          // Réinitialiser les Subjects
-          this.currentUserSubject.next(null);
-          this.tokenSubject.next(null);
-          
-          // Rediriger vers la page de connexion
-          this.router.navigate(['/login']);
+        tap(() => this.clearSession()),
+        catchError(error => {
+          // Même en cas d'erreur, on efface la session locale
+          this.clearSession();
+          return throwError(() => error);
         })
       );
   }
 
-  // Récupérer les informations de l'utilisateur actuel
-  getMe(): Observable<AuthResponse> {
-    return this.http.get<AuthResponse>(`${this.apiUrl}/me`);
+  // Méthode pour déconnexion manuelle (sans appel API)
+  manualLogout(): void {
+    this.clearSession();
+    this.router.navigate(['/login']);
   }
 
-  // Vérifier si l'utilisateur est connecté
+  // Nettoyer la session
+  clearSession(): void {
+    // Supprimer les données du stockage local
+    localStorage.removeItem('currentUser');
+    localStorage.removeItem('token');
+    
+    // Réinitialiser les Subjects
+    this.currentUserSubject.next(null);
+    this.tokenSubject.next(null);
+    
+    // Rediriger vers la page de connexion
+    this.router.navigate(['/login']);
+  }
+
+  // Configurer la session
+  private setSession(user: User, token: string): void {
+    // Stocker les détails de l'utilisateur et le token
+    localStorage.setItem('currentUser', JSON.stringify(user));
+    localStorage.setItem('token', token);
+    
+    // Mettre à jour les Subjects
+    this.currentUserSubject.next(user);
+    this.tokenSubject.next(token);
+  }
+
+  // Vérifier si l'utilisateur est connecté avec vérification de la validité du token
   isLoggedIn(): boolean {
     return !!this.currentUserValue && !!this.tokenValue;
   }
@@ -114,5 +146,30 @@ export class AuthService {
   // Vérifier si l'utilisateur a un rôle spécifique
   hasRole(role: string): boolean {
     return this.currentUserValue?.role === role;
+  }
+  
+  // NOUVELLES MÉTHODES POUR COMPATIBILITÉ AVEC LE COMPOSANT APPOINTMENT
+
+  // Vérifier l'authentification (renvoie un Observable<boolean>)
+  isAuthenticated(): Observable<boolean> {
+    const token = this.tokenValue;
+    
+    if (!token) {
+      return of(false);
+    }
+    
+    // Vérifier la validité du token
+    return this.verifyToken().pipe(
+      map(() => true),
+      catchError(() => {
+        this.clearSession();
+        return of(false);
+      })
+    );
+  }
+  
+  // Récupérer le token pour les en-têtes d'autorisation
+  getAuthToken(): string | null {
+    return this.tokenValue;
   }
 }

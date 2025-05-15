@@ -19,6 +19,8 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'admin-doctors', component: AdminDoctorsComponent, canActivate: [AuthGuard] },
   {path:'admin-dashboard' , component:AdminDashboardComponent},
+  
+
 
 ];
 
