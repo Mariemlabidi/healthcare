@@ -1,9 +1,10 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../auth.service';
 import { environment } from '../../environments/environment';
+import { finalize } from 'rxjs/operators';
 
 @Component({
   selector: 'app-appointment-form',
@@ -19,6 +20,7 @@ export class AppointmentFormComponent implements OnInit {
   isSubmitting = false;
   formSubmitted = false;
   formError: string | null = null;
+  formSuccess: string | null = null;
   
   constructor(
     private fb: FormBuilder,
@@ -67,8 +69,6 @@ export class AppointmentFormComponent implements OnInit {
         }
       }
     );
-    
-    
   }
   
   // Pré-remplir le formulaire avec les informations de l'utilisateur
@@ -86,23 +86,35 @@ export class AppointmentFormComponent implements OnInit {
   
   // Charger les créneaux horaires disponibles pour la date sélectionnée
   loadAvailableTimeSlots(date: string): void {
-    this.http.get<any>(`${this.apiUrl}/availability?date=${date}`).subscribe({
-      next: (response) => {
-        if (response.success && response.availableTimeSlots) {
-          this.availableTimeSlots = response.availableTimeSlots;
-          
-          // Réinitialiser le créneau horaire si celui sélectionné n'est plus disponible
-          const currentTime = this.appointmentForm.get('appointmentTime')?.value;
-          if (currentTime && !this.availableTimeSlots.includes(currentTime)) {
-            this.appointmentForm.get('appointmentTime')?.setValue('');
+    // Cette route est publique, pas besoin d'authentification selon votre backend
+    this.http.get<any>(`${this.apiUrl}/availability?date=${date}`)
+      .subscribe({
+        next: (response) => {
+          if (response.success && response.availableTimeSlots) {
+            this.availableTimeSlots = response.availableTimeSlots;
+            
+            // Réinitialiser le créneau horaire si celui sélectionné n'est plus disponible
+            const currentTime = this.appointmentForm.get('appointmentTime')?.value;
+            if (currentTime && !this.availableTimeSlots.includes(currentTime)) {
+              this.appointmentForm.get('appointmentTime')?.setValue('');
+            }
+          } else {
+            // Initialiser avec des créneaux par défaut au cas où le backend ne répond pas correctement
+            this.availableTimeSlots = [
+              '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+              '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
+            ];
           }
+        },
+        error: (error) => {
+          console.error('Erreur lors du chargement des créneaux disponibles:', error);
+          // Utiliser des créneaux par défaut en cas d'erreur
+          this.availableTimeSlots = [
+            '09:00', '09:30', '10:00', '10:30', '11:00', '11:30',
+            '14:00', '14:30', '15:00', '15:30', '16:00', '16:30'
+          ];
         }
-      },
-      error: (error) => {
-        console.error('Erreur lors du chargement des créneaux disponibles:', error);
-        this.availableTimeSlots = [];
-      }
-    });
+      });
   }
 
   onSubmit() {
@@ -111,53 +123,83 @@ export class AppointmentFormComponent implements OnInit {
       Object.keys(this.appointmentForm.controls).forEach(key => {
         this.appointmentForm.get(key)?.markAsTouched();
       });
+      this.formError = "Veuillez remplir tous les champs obligatoires correctement.";
       return;
     }
 
-    // Vérifier d'abord si l'utilisateur est connecté
-    if (!this.isLoggedIn) {
-      // Stocker l'URL actuelle pour y revenir après la connexion
-      const returnUrl = this.router.url;
-      // Rediriger vers la page de connexion
-      this.router.navigate(['/login'], { 
-        queryParams: { returnUrl }
-      });
-      return;
-    }
+    // Réinitialiser les messages d'erreur/succès
+    this.formError = null;
+    this.formSuccess = null;
 
+    // Vérifier à nouveau si l'utilisateur est connecté
+    this.authService.isAuthenticated().subscribe(isAuthenticated => {
+      if (!isAuthenticated) {
+        this.formError = "Votre session a expiré. Vous allez être redirigé vers la page de connexion.";
+        setTimeout(() => {
+          const returnUrl = this.router.url;
+          this.router.navigate(['/login'], { 
+            queryParams: { returnUrl }
+          });
+        }, 2000);
+        return;
+      }
+      
+      // Continuer avec la soumission si authentifié
+      this.submitAppointment();
+    });
+  }
+  
+  private submitAppointment() {
     // Éviter les soumissions multiples
     if (this.isSubmitting) return;
     
     this.isSubmitting = true;
     this.formError = null;
 
-    // Ajout du token d'authentification dans les requêtes HTTP
+    // Récupérer le token
     const token = this.authService.getAuthToken();
-    const headers = { 'Authorization': `Bearer ${token}` };
+    
+    if (!token) {
+      this.formError = "Vous n'êtes pas authentifié. Veuillez vous reconnecter.";
+      this.isSubmitting = false;
+      setTimeout(() => this.authService.clearSession(), 2000);
+      return;
+    }
+    
+    // Construire les en-têtes avec le token d'authentification
+    const headers = new HttpHeaders()
+      .set('Content-Type', 'application/json')
+      .set('Authorization', `Bearer ${token}`);
 
     this.http.post(this.apiUrl, this.appointmentForm.value, { headers })
+      .pipe(
+        finalize(() => {
+          this.isSubmitting = false;
+        })
+      )
       .subscribe({
         next: (response: any) => {
-          this.isSubmitting = false;
           this.formSubmitted = true;
-          console.log('Rendez-vous enregistré:', response);
+          this.formSuccess = "Rendez-vous enregistré avec succès!";
           
           // Réinitialiser le formulaire après succès
-          this.appointmentForm.reset();
-          
-          // Rediriger vers une page de confirmation avec le détail du rendez-vous
-          this.router.navigate(['/appointments/confirmation'], { 
-            state: { appointment: response.data } 
-          });
+          setTimeout(() => {
+            this.appointmentForm.reset();
+            // Rediriger vers une page de confirmation avec le détail du rendez-vous
+            this.router.navigate(['/appointments/confirmation'], { 
+              state: { appointment: response.data } 
+            });
+          }, 1500);
         },
         error: (error) => {
-          this.isSubmitting = false;
           console.error('Erreur lors de l\'enregistrement du rendez-vous:', error);
           
           // Gestion des erreurs spécifiques
           if (error.status === 401) {
-            this.formError = 'Votre session a expiré. Veuillez vous reconnecter.';
-            this.authService.clearSession();
+            // Afficher le message d'erreur complet du serveur
+            console.error('Détails de l\'erreur 401:', error.error);
+            this.formError = 'Erreur d\'authentification: ' + (error.error?.message || 'Votre session a expiré. Veuillez vous reconnecter.');
+            setTimeout(() => this.authService.clearSession(), 2000); // Ceci va rediriger vers login après 2 secondes
           } else if (error.status === 400 && error.error?.message) {
             this.formError = error.error.message;
           } else {

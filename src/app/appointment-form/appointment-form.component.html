@@ -1,10 +1,26 @@
 <div class="appointment-container">
   <h2>Prendre un Rendez-vous</h2>
 
+  <!-- Messages d'erreur et de succès -->
+  <div *ngIf="formError" class="error-alert">{{formError}}</div>
+  <div *ngIf="formSuccess" class="success-alert">{{formSuccess}}</div>
+
+  <!-- Indicateur de chargement -->
+  <div *ngIf="isSubmitting" class="loading-indicator">
+    <div class="spinner"></div>
+    <p>Traitement en cours...</p>
+  </div>
+
+  <!-- Formulaire de rendez-vous -->
   <form [formGroup]="appointmentForm" (ngSubmit)="onSubmit()" class="form-grid">
     <div class="form-group">
       <label for="patientName">Nom du Patient</label>
-      <input type="text" id="patientName" formControlName="patientName">
+      <input 
+        type="text" 
+        id="patientName" 
+        formControlName="patientName"
+        aria-label="Nom du patient"
+        placeholder="Votre nom complet">
       <div *ngIf="appointmentForm.get('patientName')?.invalid && appointmentForm.get('patientName')?.touched" class="error-message">
         Nom obligatoire
       </div>
@@ -12,7 +28,12 @@
 
     <div class="form-group">
       <label for="email">Email</label>
-      <input type="email" id="email" formControlName="email">
+      <input 
+        type="email" 
+        id="email" 
+        formControlName="email"
+        aria-label="Adresse email"
+        placeholder="votre.email@exemple.com">
       <div *ngIf="appointmentForm.get('email')?.invalid && appointmentForm.get('email')?.touched" class="error-message">
         Email valide requis
       </div>
@@ -20,7 +41,12 @@
 
     <div class="form-group">
       <label for="phone">Téléphone</label>
-      <input type="text" id="phone" formControlName="phone">
+      <input 
+        type="tel" 
+        id="phone" 
+        formControlName="phone"
+        aria-label="Numéro de téléphone"
+        placeholder="0123456789">
       <div *ngIf="appointmentForm.get('phone')?.invalid && appointmentForm.get('phone')?.touched" class="error-message">
         Numéro invalide
       </div>
@@ -28,19 +54,59 @@
 
     <div class="form-group">
       <label for="appointmentDate">Date du Rendez-vous</label>
-      <input type="date" id="appointmentDate" formControlName="appointmentDate">
+      <input 
+        type="date" 
+        id="appointmentDate" 
+        formControlName="appointmentDate"
+        aria-label="Date du rendez-vous">
+      <div *ngIf="appointmentForm.get('appointmentDate')?.invalid && appointmentForm.get('appointmentDate')?.touched" class="error-message">
+        Date requise
+      </div>
     </div>
 
     <div class="form-group">
       <label for="appointmentTime">Heure du Rendez-vous</label>
-      <input type="time" id="appointmentTime" formControlName="appointmentTime">
+      <!-- Utiliser un select avec les créneaux disponibles si présents -->
+      <select 
+        *ngIf="availableTimeSlots && availableTimeSlots.length > 0"
+        id="appointmentTime" 
+        formControlName="appointmentTime"
+        aria-label="Heure du rendez-vous">
+        <option value="">Sélectionnez un horaire</option>
+        <option *ngFor="let slot of availableTimeSlots" [value]="slot">{{slot}}</option>
+      </select>
+      
+      <!-- Fallback à un input time si pas de créneaux disponibles -->
+      <input 
+        *ngIf="!availableTimeSlots || availableTimeSlots.length === 0"
+        type="time" 
+        id="appointmentTime" 
+        formControlName="appointmentTime"
+        aria-label="Heure du rendez-vous">
+      
+      <div *ngIf="appointmentForm.get('appointmentTime')?.invalid && appointmentForm.get('appointmentTime')?.touched" class="error-message">
+        Heure requise
+      </div>
     </div>
 
     <div class="form-group full-width">
       <label for="reason">Motif du Rendez-vous</label>
-      <textarea id="reason" formControlName="reason"></textarea>
+      <textarea 
+        id="reason" 
+        formControlName="reason"
+        aria-label="Motif du rendez-vous"
+        placeholder="Veuillez décrire la raison de votre rendez-vous"></textarea>
+      <div *ngIf="appointmentForm.get('reason')?.invalid && appointmentForm.get('reason')?.touched" class="error-message">
+        Motif requis
+      </div>
     </div>
 
-    <button type="submit" class="submit-btn">Envoyer</button>
+    <button 
+      type="submit" 
+      class="submit-btn" 
+      [disabled]="isSubmitting || appointmentForm.invalid">
+      <span *ngIf="!isSubmitting">Confirmer le rendez-vous</span>
+      <span *ngIf="isSubmitting">Envoi en cours...</span>
+    </button>
   </form>
 </div>

@@ -1,6 +1,5 @@
-// src/app/services/auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, of, throwError } from 'rxjs';
 import { map, tap, catchError, switchMap } from 'rxjs/operators';
 import { environment } from '../environments/environment';
@@ -85,18 +84,22 @@ export class AuthService {
     return throwError(() => new Error('Aucun token disponible'));
   }
 
-  const headers = {
-    Authorization: `Bearer ${token}`
-  };
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`
+  });
 
   return this.http.get<any>(`${this.apiUrl}/verify-token`, { headers });
 }
 
-
   // Déconnecter un utilisateur
   logout(): Observable<any> {
     // Envoyer une requête de déconnexion au serveur
-    return this.http.get<any>(`${this.apiUrl}/logout`)
+    const token = this.tokenValue;
+    const headers = token ? new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    }) : undefined;
+
+    return this.http.get<any>(`${this.apiUrl}/logout`, { headers })
       .pipe(
         tap(() => this.clearSession()),
         catchError(error => {
