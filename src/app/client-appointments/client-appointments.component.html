@@ -1,0 +1,102 @@
+<div class="appointments-container">
+  <header class="appointments-header">
+    <h1>Mes Rendez-vous</h1>
+    <button class="btn-new-appointment" (click)="bookNewAppointment()">
+      Prendre un nouveau rendez-vous
+    </button>
+  </header>
+
+  <!-- Notification messages -->
+  <div class="notification error" *ngIf="error">{{ error }}</div>
+  <div class="notification success" *ngIf="success">{{ success }}</div>
+
+  <!-- Filter tabs -->
+  <div class="filter-tabs">
+    <button [class.active]="activeFilter === 'all'" (click)="setFilter('all')">
+      Tous
+    </button>
+    <button [class.active]="activeFilter === 'upcoming'" (click)="setFilter('upcoming')">
+      À venir <span *ngIf="upcomingAppointments.length" class="badge">{{ upcomingAppointments.length }}</span>
+    </button>
+    <button [class.active]="activeFilter === 'past'" (click)="setFilter('past')">
+      Passés
+    </button>
+  </div>
+
+  <!-- Loading indicator -->
+  <div class="loading-container" *ngIf="loading">
+    <div class="loading-spinner"></div>
+    <p>Chargement de vos rendez-vous...</p>
+  </div>
+
+  <!-- No appointments message -->
+  <div class="no-appointments" *ngIf="!loading && appointments.length === 0">
+    <p>Vous n'avez aucun rendez-vous pour le moment.</p>
+    <button class="btn-primary" (click)="bookNewAppointment()">Prendre votre premier rendez-vous</button>
+  </div>
+
+  <!-- Appointments list -->
+  <div class="appointments-list" *ngIf="!loading && appointments.length > 0">
+    <!-- Upcoming appointments section -->
+    <section *ngIf="(activeFilter === 'all' || activeFilter === 'upcoming') && upcomingAppointments.length > 0">
+      <h2 *ngIf="activeFilter === 'all'">Rendez-vous à venir</h2>
+      
+      <div class="appointment-cards">
+        <div class="appointment-card" *ngFor="let appointment of upcomingAppointments">
+          <div class="appointment-status" [ngClass]="getStatusClass(appointment)"></div>
+          <div class="appointment-header">
+            <div class="appointment-date">
+              <div class="day">{{ formatDate(appointment.appointmentDate) }}</div>
+              <div class="time">{{ appointment.appointmentTime }}</div>
+            </div>
+          </div>
+          <div class="appointment-details">
+            <div class="appointment-info">
+              <h3>Motif: {{ appointment.reason }}</h3>
+              <p><strong>Patient:</strong> {{ appointment.patientName }}</p>
+              <p><strong>Téléphone:</strong> {{ appointment.phone }}</p>
+              <p><strong>Email:</strong> {{ appointment.email }}</p>
+            </div>
+            <div class="appointment-actions">
+              <button class="btn-cancel" (click)="cancelAppointment(appointment._id || '')">Annuler</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Past appointments section -->
+    <section *ngIf="(activeFilter === 'all' || activeFilter === 'past') && pastAppointments.length > 0">
+      <h2 *ngIf="activeFilter === 'all'">Rendez-vous passés</h2>
+      
+      <div class="appointment-cards">
+        <div class="appointment-card past" *ngFor="let appointment of pastAppointments">
+          <div class="appointment-status" [ngClass]="getStatusClass(appointment)"></div>
+          <div class="appointment-header">
+            <div class="appointment-date">
+              <div class="day">{{ formatDate(appointment.appointmentDate) }}</div>
+              <div class="time">{{ appointment.appointmentTime }}</div>
+            </div>
+            <div class="appointment-badge" *ngIf="appointment.status === 'annulé'">Annulé</div>
+            <div class="appointment-badge completed" *ngIf="appointment.status !== 'annulé'">Terminé</div>
+          </div>
+          <div class="appointment-details">
+            <div class="appointment-info">
+              <h3>Motif: {{ appointment.reason }}</h3>
+              <p><strong>Patient:</strong> {{ appointment.patientName }}</p>
+              <p><strong>Téléphone:</strong> {{ appointment.phone }}</p>
+              <p><strong>Email:</strong> {{ appointment.email }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- No results for filter -->
+    <div class="no-filter-results" *ngIf="(activeFilter === 'upcoming' && upcomingAppointments.length === 0) || 
+                                        (activeFilter === 'past' && pastAppointments.length === 0)">
+      <p *ngIf="activeFilter === 'upcoming'">Vous n'avez pas de rendez-vous à venir.</p>
+      <p *ngIf="activeFilter === 'past'">Vous n'avez pas d'historique de rendez-vous.</p>
+    </div>
+  </div>
+</div>

@@ -3,7 +3,7 @@ export interface User {
   name: string;
   email: string;
   password?: string;
-  role: 'client' | 'medecin' | 'admin'; // Corrigé pour correspondre au backend
+  role: 'client' | 'medecin' | 'admin'; 
   phone?: string; // Optionnel
   token?: string;
 }
@@ -18,7 +18,7 @@ export interface RegisterRequest {
   email: string;
   password: string;
   passwordConfirm: string;
-  role: 'client' | 'medecin' | 'admin'; // Corrigé pour correspondre au backend
+  role: 'client' | 'medecin' | 'admin'; 
 }
 
 export interface AuthResponse {

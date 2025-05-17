@@ -8,6 +8,7 @@ import { RegisterComponent } from './register/register.component';
 import { AuthGuard } from './auth.guard';
 import{AdminDoctorsComponent} from './admin-doctors/admin-doctors.component'
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { ClientAppointmentsComponent } from './client-appointments/client-appointments.component';
 
 
 
@@ -19,6 +20,7 @@ const routes: Routes = [
   { path: 'register', component: RegisterComponent },
   { path: 'admin-doctors', component: AdminDoctorsComponent, canActivate: [AuthGuard] },
   {path:'admin-dashboard' , component:AdminDashboardComponent},
+  {path:'client-appointment',component:ClientAppointmentsComponent}
   
 
 

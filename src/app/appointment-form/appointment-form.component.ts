@@ -186,7 +186,7 @@ export class AppointmentFormComponent implements OnInit {
           setTimeout(() => {
             this.appointmentForm.reset();
             // Rediriger vers une page de confirmation avec le détail du rendez-vous
-            this.router.navigate(['/appointments/confirmation'], { 
+            this.router.navigate(['/client-appointment'], { 
               state: { appointment: response.data } 
             });
           }, 1500);

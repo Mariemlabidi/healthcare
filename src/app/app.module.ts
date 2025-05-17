@@ -30,6 +30,8 @@ import { AngularFirestoreModule } from '@angular/fire/compat/firestore';
 import { environment } from '../environments/environment';
 import { AdminDoctorsComponent } from './admin-doctors/admin-doctors.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
+import { ClientAppointmentsComponent } from './client-appointments/client-appointments.component';
+
 
 
 
@@ -55,6 +57,8 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
     RegisterComponent,
     AdminDoctorsComponent,
     AdminDashboardComponent,
+    ClientAppointmentsComponent,
+    ClientAppointmentsComponent,
   
   
   ],
@@ -78,6 +82,7 @@ import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.compo
       { path: 'register', component: RegisterComponent },
       {path:'admin-doctors',component:AdminDoctorsComponent},
       {path:'admin-dashboard' , component:AdminDashboardComponent},
+      {path:'client-appointment',component:ClientAppointmentsComponent}
       
 
     ])
