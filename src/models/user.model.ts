@@ -27,3 +27,11 @@ export interface AuthResponse {
   token?: string;
   message?: string;
 }
+
+export interface Testimonial {
+  id?: number;
+  name: string;
+  subtitle: string;
+  content: string;
+  createdAt?: Date;
+}
