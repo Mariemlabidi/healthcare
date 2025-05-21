@@ -1,29 +1,29 @@
 <div class="testimonial-section">
-    <h2 class="testimonial-heading">OUR TESTIMONIAL</h2>
+  <h2 class="section-title">OUR TESTIMONIAL</h2>
+  
+  <!-- Message de chargement -->
+  <div *ngIf="isLoading" class="testimonial-loading">
+    Chargement des témoignages...
+  </div>
+  
+  <!-- Message d'erreur -->
+  <div *ngIf="hasError" class="testimonial-error">
+    {{ errorMessage }}
+  </div>
+  
+  <!-- Affichage du témoignage -->
+  <div *ngIf="!isLoading && testimonials.length > 0" class="testimonial-container">
+    <div class="testimonial-content">
+      <h3 class="testimonial-name">{{ currentTestimonial.name }}</h3>
+      <p class="testimonial-subtitle">{{ currentTestimonial.subtitle }}</p>
+      <p class="testimonial-text">{{ currentTestimonial.content }}</p>
+      <div class="testimonial-quote">"</div>
+    </div>
     
-    <div class="testimonial-container">
-      <div class="testimonial-card">
-        <div class="testimonial-header">
-          <h3 class="testimonial-name">{{ currentTestimonial.name }}</h3>
-          <p class="testimonial-subtitle">{{ currentTestimonial.subtitle }}</p>
-        </div>
-        
-        <div class="testimonial-content">
-          <p>{{ currentTestimonial.content }}</p>
-        </div>
-        
-        <div class="testimonial-quote-icon">
-          <span class="quote-mark">"</span>
-        </div>
-      </div>
-      
-      <div class="testimonial-controls">
-        <button class="control-button prev" (click)="previousTestimonial()">
-          <span class="arrow">&#60;</span>
-        </button>
-        <button class="control-button next" (click)="nextTestimonial()">
-          <span class="arrow">&#62;</span>
-        </button>
-      </div>
+    <!-- Boutons de navigation -->
+    <div class="testimonial-navigation">
+      <button (click)="previousTestimonial()" class="nav-button prev">&lt;</button>
+      <button (click)="nextTestimonial()" class="nav-button next">&gt;</button>
     </div>
   </div>
+</div>

@@ -39,6 +39,7 @@ export class DoctorsComponent implements OnInit, AfterViewInit {
         next: (data) => {
           this.doctors = data;
           this.loading = false;
+          console.log(data);
           
           // Si le swiper est déjà initialisé, on le met à jour
           setTimeout(() => {
