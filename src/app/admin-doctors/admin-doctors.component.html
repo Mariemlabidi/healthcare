@@ -38,7 +38,7 @@
             <tr *ngFor="let doctor of filteredDoctors">
               <td>{{ doctor.id }}</td>
               <td>
-                <img [src]="doctor.image" alt="{{ doctor.name }}" class="doctor-thumbnail">
+                <img [src]="doctor.image" [alt]="doctor.name" class="doctor-thumbnail">
               </td>
               <td>{{ doctor.name }}</td>
               <td>{{ doctor.title }}</td>
