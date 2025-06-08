@@ -3,6 +3,8 @@
     <h2 class="card-header">Inscription</h2>
     <div class="card-body">
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        
+        <!-- Nom complet -->
         <div class="form-group">
           <label for="name">Nom complet</label>
           <input 
@@ -16,7 +18,8 @@
             <div *ngIf="f['name'].errors['required']">Le nom est requis</div>
           </div>
         </div>
-        
+
+        <!-- Email -->
         <div class="form-group">
           <label for="email">Email</label>
           <input 
@@ -31,7 +34,8 @@
             <div *ngIf="f['email'].errors['email']">Veuillez entrer un email valide</div>
           </div>
         </div>
-        
+
+        <!-- Mot de passe -->
         <div class="form-group">
           <label for="password">Mot de passe</label>
           <input 
@@ -48,8 +52,8 @@
             </div>
           </div>
         </div>
-        
-        <!-- Ajout du champ de confirmation de mot de passe -->
+
+        <!-- Confirmation mot de passe -->
         <div class="form-group">
           <label for="passwordConfirm">Confirmer le mot de passe</label>
           <input 
@@ -67,7 +71,8 @@
             <div *ngIf="registerForm.hasError('mismatch')">Les mots de passe ne correspondent pas</div>
           </div>
         </div>
-        
+
+        <!-- Rôle -->
         <div class="form-group">
           <label for="role">Rôle</label>
           <select 
@@ -82,7 +87,46 @@
             <div *ngIf="f['role'].errors['required']">Le rôle est requis</div>
           </div>
         </div>
-        
+
+        <!-- Téléphone (client uniquement) -->
+        <div class="form-group" *ngIf="f['role'].value === 'client'">
+          <label for="phone">Téléphone</label>
+          <input 
+            type="text" 
+            id="phone"
+            formControlName="phone" 
+            class="form-control" 
+            [ngClass]="{ 'is-invalid': submitted && f['phone'].errors }" 
+          />
+          <div *ngIf="submitted && f['phone'].errors" class="invalid-feedback">
+            <div *ngIf="f['phone'].errors?.['required']">Le numéro de téléphone est requis</div>
+            <div *ngIf="f['phone'].errors?.['pattern']">Le numéro de téléphone doit contenir entre 8 et 15 chiffres</div>
+          </div>
+        </div>
+
+        <!-- Date de naissance (client uniquement) -->
+        <div class="form-group" *ngIf="f['role'].value === 'client'">
+          <label for="birthDate">Date de naissance</label>
+          <input 
+            type="date" 
+            id="birthDate"
+            formControlName="birthDate" 
+            class="form-control" 
+          />
+        </div>
+
+        <!-- Adresse (client uniquement) -->
+        <div class="form-group" *ngIf="f['role'].value === 'client'">
+          <label for="address">Adresse</label>
+          <input 
+            type="text" 
+            id="address"
+            formControlName="address" 
+            class="form-control"
+          />
+        </div>
+
+        <!-- Boutons -->
         <div class="form-group">
           <button [disabled]="loading" class="btn btn-primary">
             <span *ngIf="loading" class="spinner-border spinner-border-sm mr-1"></span>
@@ -90,12 +134,15 @@
           </button>
           <a routerLink="/login" class="btn btn-link">Annuler</a>
         </div>
-        
+
+        <!-- Erreur générale -->
         <div *ngIf="error" class="alert alert-danger mt-3">{{ error }}</div>
-        
+
+        <!-- Lien de connexion -->
         <div class="mt-3">
           <p>Vous avez déjà un compte ? <a routerLink="/login">Se connecter</a></p>
         </div>
+
       </form>
     </div>
   </div>

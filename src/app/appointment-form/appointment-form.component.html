@@ -64,6 +64,20 @@
       </div>
     </div>
 
+    <!-- 🔽 Champ select pour le médecin -->
+    <div class="form-group">
+      <label for="doctor">Médecin</label>
+      <select id="doctor" formControlName="doctor" class="form-control" required>
+        <option value="" disabled selected>Choisir un médecin</option>
+        <option *ngFor="let doc of doctors" [value]="doc._id">
+          {{ doc.name }} - {{ doc.title }}
+        </option>
+      </select>
+      <div *ngIf="appointmentForm.get('doctor')?.touched && appointmentForm.get('doctor')?.invalid" class="text-danger">
+        Veuillez sélectionner un médecin.
+      </div>
+    </div>
+
     <div class="form-group">
       <label for="appointmentTime">Heure du Rendez-vous</label>
       <!-- Utiliser un select avec les créneaux disponibles si présents -->

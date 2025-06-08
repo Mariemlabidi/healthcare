@@ -137,6 +137,12 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     
     return this.dashboardService.getDoctors().pipe(
       tap(doctors => {
+
+         if (this.doctors.length > 0) {
+        // Attendre que la vue soit mise à jour
+        this.selectDoctorWhenReady();
+      }
+
         console.log('✓ Médecins récupérés:', doctors);
         console.log('✓ Nombre de médecins:', doctors.length);
         
@@ -150,7 +156,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
         // Sélectionner le premier médecin automatiquement
         if (this.doctors.length > 0) {
           console.log('Auto-sélection du premier médecin');
-          setTimeout(() => this.selectDoctor('0'), 100);
+          setTimeout(() => this.selectDoctor('0'), 500);
         } else {
           console.warn('⚠️ Aucun médecin trouvé dans la base de données');
         }
@@ -166,6 +172,21 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
       })
     );
   }
+
+  private selectDoctorWhenReady(): void {
+  // Vérifier que les éléments DOM sont disponibles
+  const checkAndSelect = () => {
+    const canvas = document.getElementById('doctorChart');
+    if (canvas) {
+      this.selectDoctor('0');
+    } else {
+      setTimeout(checkAndSelect, 100);
+    }
+  };
+  checkAndSelect();
+}
+
+
 
   private getPatients() {
     this.loadingPatients = true;
@@ -271,6 +292,11 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
   }
 
   renderDoctorChart(): void {
+
+    console.log('=== DIAGNOSTIC GRAPHIQUE MÉDECIN ===');
+    console.log('selectedDoctor:', this.selectedDoctor);
+    console.log('appointmentsPerDay:', this.selectedDoctor?.appointmentsPerDay);
+
     if (!this.selectedDoctor || !this.selectedDoctor.appointmentsPerDay) {
       console.warn('Données insuffisantes pour afficher le graphique du médecin');
       return;
@@ -279,6 +305,7 @@ export class AdminDashboardComponent implements OnInit, AfterViewInit {
     const ctx = document.getElementById('doctorChart') as HTMLCanvasElement;
     if (!ctx) {
       console.error('Élément Canvas "doctorChart" non trouvé dans le DOM');
+       console.log('Nombre de rendez-vous:', this.selectedDoctor.appointmentsPerDay.length);
       return;
     }
 

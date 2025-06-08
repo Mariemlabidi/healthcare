@@ -11,12 +11,12 @@ import { RegisterRequest } from '../../models/user.model';
   styleUrls: ['./register.component.css']
 })
 export class RegisterComponent implements OnInit {
-  registerForm!: FormGroup; // Utilisation de l'opérateur ! pour indiquer à TypeScript que cette propriété sera initialisée
+  registerForm!: FormGroup; 
   loading = false;
   submitted = false;
   error = '';
   roles = [
-    { value: 'client', label: 'client' }, // Corrigé : 'client' au lieu de 'patient'
+    { value: 'client', label: 'client' }, 
     { value: 'medecin', label: 'Médecin' },
     { value: 'admin', label: 'Administrateur' }
   ];
@@ -33,15 +33,19 @@ export class RegisterComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.registerForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
-      passwordConfirm: ['', [Validators.required, Validators.minLength(6)]],
-      role: ['client', Validators.required] // Valeur par défaut modifiée à 'client'
-    }, {
-      validators: this.passwordMatchValidator
-    });
+       this.registerForm = this.formBuilder.group({
+          name: ['', Validators.required],
+          email: ['', [Validators.required, Validators.email]],
+          password: ['', [Validators.required, Validators.minLength(6)]],
+          passwordConfirm: ['', [Validators.required, Validators.minLength(6)]],
+          role: ['client', Validators.required],
+          phone: [''], // facultatif
+          birthDate: [''],
+          address: ['']
+        }, {
+  validators: this.passwordMatchValidator
+});
+
   }
 
   // Validateur personnalisé pour vérifier que les mots de passe correspondent
@@ -70,13 +74,17 @@ export class RegisterComponent implements OnInit {
 
     this.loading = true;
     
-    const registerData: RegisterRequest = {
+   const registerData: RegisterRequest = {
       name: this.f['name'].value,
       email: this.f['email'].value,
       password: this.f['password'].value,
       passwordConfirm: this.f['passwordConfirm'].value,
-      role: this.f['role'].value
-    };
+      role: this.f['role'].value,
+      phone: this.f['phone'].value,
+      birthDate: this.f['birthDate'].value,
+      address: this.f['address'].value
+  };
+
 
     console.log('Données d\'inscription avant envoi:', registerData);
 

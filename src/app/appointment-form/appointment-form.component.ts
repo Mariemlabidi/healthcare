@@ -34,16 +34,20 @@ export class AppointmentFormComponent implements OnInit {
       phone: ['', [Validators.required, Validators.pattern('^[0-9]{8,15}$')]],
       appointmentDate: ['', Validators.required],
       appointmentTime: ['', Validators.required],
-      reason: ['', Validators.required]
+      reason: ['', Validators.required],
+      doctor: ['', Validators.required]
     });
   }
-
+   
+  doctors: any[] = [];
   ngOnInit(): void {
     // Vérifier si l'utilisateur est connecté lors de l'initialisation du composant
     this.checkLoginStatus();
     
     // Pré-remplir le formulaire avec les informations de l'utilisateur connecté si disponibles
     this.prepopulateForm();
+
+    this.loadDoctors(); 
     
     // Ajouter un écouteur sur le changement de date pour charger les créneaux disponibles
     this.appointmentForm.get('appointmentDate')?.valueChanges.subscribe(date => {
@@ -52,6 +56,18 @@ export class AppointmentFormComponent implements OnInit {
       }
     });
   }
+
+  loadDoctors(): void {
+  this.http.get<any>(`${environment.apiUrl}/doctors`)
+    .subscribe({
+      next: (doctors) => {
+        this.doctors = doctors;
+      },
+      error: (err) => {
+        console.error('Erreur lors du chargement des médecins:', err);
+      }
+    });
+}
 
   // Méthode pour vérifier le statut de connexion
   checkLoginStatus(): void {

@@ -18,8 +18,12 @@ export interface RegisterRequest {
   email: string;
   password: string;
   passwordConfirm: string;
-  role: 'client' | 'medecin' | 'admin'; 
+  role: string;
+  phone?: string;
+  birthDate?: string;
+  address?: string;
 }
+
 
 export interface AuthResponse {
   success: boolean;

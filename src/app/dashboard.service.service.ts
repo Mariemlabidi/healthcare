@@ -130,7 +130,7 @@ export class DashboardService {
 
   // Récupère les rendez-vous pour un médecin spécifique
   getDoctorAppointments(doctorId: string): Observable<{ date: string, count: number }[]> {
-    const url = `${this.baseUrl}/dashboard/doctor/${doctorId}/appointments`;
+    const url = `${this.baseUrl}/dashboard/doctors/${doctorId}/appointments`;
     console.log('Calling getDoctorAppointments API:', url);
     
     return this.http.get<{ date: string, count: number }[]>(url, this.getHttpOptions())
@@ -142,7 +142,8 @@ export class DashboardService {
 
   // Récupère les rendez-vous pour un patient spécifique
   getPatientAppointments(patientId: string): Observable<{ month: string, count: number }[]> {
-    const url = `${this.baseUrl}/dashboard/patient/${patientId}/appointments`;
+    const url = `${this.baseUrl}/dashboard/patients/${patientId}/appointments`;
+
     console.log('Calling getPatientAppointments API:', url);
     
     return this.http.get<{ month: string, count: number }[]>(url, this.getHttpOptions())
