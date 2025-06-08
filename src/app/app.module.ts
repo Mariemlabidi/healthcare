@@ -31,6 +31,7 @@ import { environment } from '../environments/environment';
 import { AdminDoctorsComponent } from './admin-doctors/admin-doctors.component';
 import { AdminDashboardComponent } from './admin-dashboard/admin-dashboard.component';
 import { ClientAppointmentsComponent } from './client-appointments/client-appointments.component';
+import { ChatbotComponent } from './chatbot/chatbot.component';
 
 
 
@@ -59,6 +60,7 @@ import { ClientAppointmentsComponent } from './client-appointments/client-appoin
     AdminDashboardComponent,
     ClientAppointmentsComponent,
     ClientAppointmentsComponent,
+    ChatbotComponent,
   
   
   ],

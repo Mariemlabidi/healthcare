@@ -24,6 +24,8 @@ export class ContactComponent implements OnInit {
     private router: Router
   ) {}
 
+
+
   ngOnInit(): void {
     // Initialiser le formulaire
     this.contactForm = this.formBuilder.group({
