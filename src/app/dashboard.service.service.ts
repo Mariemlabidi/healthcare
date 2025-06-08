@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError } from 'rxjs';
-import { catchError, tap } from 'rxjs/operators';
+import { Observable, throwError, of } from 'rxjs';
+import { catchError, tap, map } from 'rxjs/operators';
 import { Doctor, Patient, Stats } from '../models/dashboard.model';
 import { environment } from '../environments/environment';
 
@@ -24,6 +24,14 @@ export class DashboardService {
     } else {
       // Erreur côté serveur
       errorMessage = `Code d'erreur: ${error.status}, Message: ${error.message}`;
+      
+      // Log détaillé pour le debugging
+      console.error('Détails de l\'erreur HTTP:', {
+        status: error.status,
+        statusText: error.statusText,
+        url: error.url,
+        error: error.error
+      });
     }
     console.error(errorMessage);
     return throwError(() => new Error(errorMessage));
@@ -31,76 +39,116 @@ export class DashboardService {
 
   // Options HTTP avec en-têtes
   private getHttpOptions() {
-    const token = localStorage.getItem('token');
+    const token = sessionStorage.getItem('token');
+    console.log('Token présent:', !!token);
+    
     return {
       headers: new HttpHeaders({
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${token}`
+        'Authorization': token ? `Bearer ${token}` : ''
       })
     };
   }
 
   // Récupère les statistiques générales
   getStats(): Observable<Stats> {
-    console.log('Calling getStats API:', `${this.baseUrl}/dashboard/stats`);
-    return this.http.get<Stats>(`${this.baseUrl}/dashboard/stats`, this.getHttpOptions())
+    const url = `${this.baseUrl}/dashboard/stats`;
+    console.log('Calling getStats API:', url);
+    
+    return this.http.get<Stats>(url, this.getHttpOptions())
       .pipe(
         tap(response => console.log('Stats API response:', response)),
         catchError(this.handleError)
       );
   }
 
-  // Récupère la liste des médecins
+  // Récupère la liste des médecins avec validation
   getDoctors(): Observable<Doctor[]> {
-    console.log('Calling getDoctors API:', `${this.baseUrl}/dashboard/doctors`);
-    return this.http.get<Doctor[]>(`${this.baseUrl}/dashboard/doctors`, this.getHttpOptions())
+    const url = `${this.baseUrl}/dashboard/doctors`;
+    console.log('Calling getDoctors API:', url);
+    
+    return this.http.get<any>(url, this.getHttpOptions())
       .pipe(
         tap(response => {
-          console.log('Doctors API response:', response);
-          if (!Array.isArray(response)) {
-            console.warn('La réponse API des médecins n\'est pas un tableau:', response);
+          console.log('Raw doctors API response:', response);
+          console.log('Response type:', typeof response);
+          console.log('Is array:', Array.isArray(response));
+        }),
+        map(response => {
+          // S'assurer que la réponse est un tableau
+          if (Array.isArray(response)) {
+            return response as Doctor[];
+          } else if (response && response.data && Array.isArray(response.data)) {
+            // Cas où la réponse est encapsulée dans un objet
+            return response.data as Doctor[];
+          } else {
+            console.warn('Format de réponse inattendu pour les médecins:', response);
+            return [];
           }
         }),
-        catchError(this.handleError)
+        tap(doctors => {
+          console.log(`Processed ${doctors.length} doctors:`, doctors);
+        }),
+        catchError(error => {
+          console.error('Erreur lors de la récupération des médecins:', error);
+          // Retourner un tableau vide en cas d'erreur
+          return of([]);
+        })
       );
   }
 
-  // Récupère la liste des patients
+  // Récupère la liste des patients avec validation
   getPatients(): Observable<Patient[]> {
-    console.log('Calling getPatients API:', `${this.baseUrl}/dashboard/patients`);
-    return this.http.get<Patient[]>(`${this.baseUrl}/dashboard/patients`, this.getHttpOptions())
+    const url = `${this.baseUrl}/dashboard/patients`;
+    console.log('Calling getPatients API:', url);
+    
+    return this.http.get<any>(url, this.getHttpOptions())
       .pipe(
         tap(response => {
-          console.log('Patients API response:', response);
-          if (!Array.isArray(response)) {
-            console.warn('La réponse API des patients n\'est pas un tableau:', response);
+          console.log('Raw patients API response:', response);
+        }),
+        map(response => {
+          // S'assurer que la réponse est un tableau
+          if (Array.isArray(response)) {
+            return response as Patient[];
+          } else if (response && response.data && Array.isArray(response.data)) {
+            return response.data as Patient[];
+          } else {
+            console.warn('Format de réponse inattendu pour les patients:', response);
+            return [];
           }
         }),
-        catchError(this.handleError)
+        tap(patients => {
+          console.log(`Processed ${patients.length} patients:`, patients);
+        }),
+        catchError(error => {
+          console.error('Erreur lors de la récupération des patients:', error);
+          return of([]);
+        })
       );
   }
 
   // Récupère les rendez-vous pour un médecin spécifique
   getDoctorAppointments(doctorId: string): Observable<{ date: string, count: number }[]> {
-    console.log('Calling getDoctorAppointments API:', `${this.baseUrl}/dashboard/doctor/${doctorId}/appointments`);
-    return this.http.get<{ date: string, count: number }[]>(
-      `${this.baseUrl}/dashboard/doctor/${doctorId}/appointments`, 
-      this.getHttpOptions()
-    ).pipe(
-      tap(response => console.log('Doctor appointments API response:', response)),
-      catchError(this.handleError)
-    );
+    const url = `${this.baseUrl}/dashboard/doctor/${doctorId}/appointments`;
+    console.log('Calling getDoctorAppointments API:', url);
+    
+    return this.http.get<{ date: string, count: number }[]>(url, this.getHttpOptions())
+      .pipe(
+        tap(response => console.log('Doctor appointments API response:', response)),
+        catchError(this.handleError)
+      );
   }
 
   // Récupère les rendez-vous pour un patient spécifique
   getPatientAppointments(patientId: string): Observable<{ month: string, count: number }[]> {
-    console.log('Calling getPatientAppointments API:', `${this.baseUrl}/dashboard/patient/${patientId}/appointments`);
-    return this.http.get<{ month: string, count: number }[]>(
-      `${this.baseUrl}/dashboard/patient/${patientId}/appointments`, 
-      this.getHttpOptions()
-    ).pipe(
-      tap(response => console.log('Patient appointments API response:', response)),
-      catchError(this.handleError)
-    );
+    const url = `${this.baseUrl}/dashboard/patient/${patientId}/appointments`;
+    console.log('Calling getPatientAppointments API:', url);
+    
+    return this.http.get<{ month: string, count: number }[]>(url, this.getHttpOptions())
+      .pipe(
+        tap(response => console.log('Patient appointments API response:', response)),
+        catchError(this.handleError)
+      );
   }
 }

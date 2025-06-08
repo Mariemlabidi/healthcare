@@ -1,22 +1,22 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { Chart, registerables } from 'chart.js';
 import { Router } from '@angular/router';
 import { DashboardService } from '../dashboard.service.service';
 import { AuthService } from '../auth.service';
 import { Doctor, Patient, Stats } from '../../models/dashboard.model';
 import { User } from '../../models/user.model';
-import { catchError, tap } from 'rxjs/operators';
-import { of } from 'rxjs';
+import { catchError, tap, finalize } from 'rxjs/operators';
+import { of, forkJoin } from 'rxjs';
 
 Chart.register(...registerables);
 
 @Component({
   selector: 'app-admin-dashboard',
-  standalone:false,
+  standalone: false,
   templateUrl: './admin-dashboard.component.html',
   styleUrls: ['./admin-dashboard.component.css']
 })
-export class AdminDashboardComponent implements OnInit {
+export class AdminDashboardComponent implements OnInit, AfterViewInit {
   doctors: Doctor[] = [];
   patients: Patient[] = [];
   selectedDoctor: Doctor | null = null;
@@ -24,6 +24,8 @@ export class AdminDashboardComponent implements OnInit {
   doctorChart: Chart | null = null;
   patientChart: Chart | null = null;
   loading = true;
+  loadingDoctors = false;
+  loadingPatients = false;
   currentUser: User | null = null;
   isLoggedIn = false;
   stats: Stats = {
@@ -40,86 +42,171 @@ export class AdminDashboardComponent implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    console.log('AdminDashboardComponent - ngOnInit called');
+    
     // Vérifier l'authentification et charger les données
-    this.authService.currentUser.subscribe(user => {
-      this.currentUser = user;
-      this.isLoggedIn = !!user;
-      
-      // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
-      if (!this.isLoggedIn) {
-        this.router.navigate(['/login']);
-        return;
-      }
+    this.authService.currentUser.subscribe({
+      next: (user) => {
+        console.log('Current user:', user);
+        this.currentUser = user;
+        this.isLoggedIn = !!user;
+        
+        // Si l'utilisateur n'est pas connecté, rediriger vers la page de connexion
+        if (!this.isLoggedIn) {
+          console.log('User not logged in, redirecting to login');
+          this.router.navigate(['/login']);
+          return;
+        }
 
-      // Vérifier que l'utilisateur a le rôle admin
-      if (this.currentUser && this.currentUser.role !== 'admin') {
-        this.router.navigate(['/']);
-        return;
+        // Vérifier que l'utilisateur a le rôle admin
+        if (this.currentUser && this.currentUser.role !== 'admin') {
+          console.log('User is not admin, redirecting to home');
+          this.router.navigate(['/']);
+          return;
+        }
+        
+        // Charger les données du tableau de bord
+        console.log('User authenticated as admin, loading dashboard data');
+        this.fetchData();
+      },
+      error: (error) => {
+        console.error('Error checking authentication:', error);
+        this.router.navigate(['/login']);
       }
-      
-      // Charger les données du tableau de bord
-      this.fetchData();
     });
+  }
+
+  ngAfterViewInit(): void {
+    console.log('AdminDashboardComponent - ngAfterViewInit called');
   }
 
   fetchData(): void {
     this.loading = true;
-    console.log('Fetching dashboard data...');
+    console.log('=== Début du chargement des données ===');
     console.log('API Base URL:', this.dashboardService['baseUrl']);
 
-    // RÉCUPÉRER LES STATISTIQUES
-    this.dashboardService.getStats().pipe(
-      tap(stats => console.log('Stats received:', stats)),
+    // Utiliser forkJoin pour charger toutes les données en parallèle
+    const requests = {
+      stats: this.getStats(),
+      doctors: this.getDoctors(),
+      patients: this.getPatients()
+    };
+
+    forkJoin(requests).pipe(
+      finalize(() => {
+        this.loading = false;
+        console.log('=== Fin du chargement des données ===');
+        console.log('Données finales:', {
+          doctors: this.doctors.length,
+          patients: this.patients.length,
+          stats: this.stats
+        });
+      })
+    ).subscribe({
+      next: (results) => {
+        console.log('Toutes les données chargées avec succès:', results);
+      },
+      error: (error) => {
+        console.error('Erreur lors du chargement des données:', error);
+      }
+    });
+  }
+
+  private getStats() {
+    return this.dashboardService.getStats().pipe(
+      tap(stats => {
+        console.log('✓ Stats récupérées:', stats);
+        this.stats = stats;
+      }),
       catchError(error => {
-        console.error('Erreur lors de la récupération des statistiques:', error);
-        return of({
+        console.error('✗ Erreur stats:', error);
+        this.stats = {
           totalDoctors: 0,
           totalPatients: 0,
           totalAppointments: 0,
           appointmentsToday: 0
+        };
+        return of(this.stats);
+      })
+    );
+  }
+
+  private getDoctors() {
+    this.loadingDoctors = true;
+    console.log('🏥 Chargement des médecins...');
+    
+    return this.dashboardService.getDoctors().pipe(
+      tap(doctors => {
+        console.log('✓ Médecins récupérés:', doctors);
+        console.log('✓ Nombre de médecins:', doctors.length);
+        
+        this.doctors = doctors;
+        
+        // Afficher chaque médecin
+        this.doctors.forEach((doctor, index) => {
+          console.log(`  - Médecin ${index + 1}: ID=${doctor.id}, Nom=${doctor.name}`);
         });
-      })
-    ).subscribe(stats => {
-      this.stats = stats;
-    });
-
-    // RÉCUPÉRER LES MÉDECINS
-    this.dashboardService.getDoctors().pipe(
-      tap(doctors => console.log('Doctors received:', doctors)),
+        
+        // Sélectionner le premier médecin automatiquement
+        if (this.doctors.length > 0) {
+          console.log('Auto-sélection du premier médecin');
+          setTimeout(() => this.selectDoctor('0'), 100);
+        } else {
+          console.warn('⚠️ Aucun médecin trouvé dans la base de données');
+        }
+      }),
       catchError(error => {
-        console.error('Erreur lors de la récupération des médecins:', error);
+        console.error('✗ Erreur médecins:', error);
+        this.doctors = [];
         return of([]);
+      }),
+      finalize(() => {
+        this.loadingDoctors = false;
+        console.log('🏥 Chargement des médecins terminé');
       })
-    ).subscribe(doctors => {
-      this.doctors = doctors;
-      console.log(`Loaded ${this.doctors.length} doctors`);
-      
-      if (this.doctors.length > 0) {
-        this.selectDoctor('0');
-      }
-    });
+    );
+  }
 
-    // RÉCUPÉRER LES PATIENTS
-    this.dashboardService.getPatients().pipe(
-      tap(patients => console.log('Patients received:', patients)),
+  private getPatients() {
+    this.loadingPatients = true;
+    console.log('👥 Chargement des patients...');
+    
+    return this.dashboardService.getPatients().pipe(
+      tap(patients => {
+        console.log('✓ Patients récupérés:', patients);
+        console.log('✓ Nombre de patients:', patients.length);
+        
+        this.patients = patients;
+        
+        // Afficher chaque patient
+        this.patients.forEach((patient, index) => {
+          console.log(`  - Patient ${index + 1}: ID=${patient.id}, Nom=${patient.name}`);
+        });
+        
+        // Sélectionner le premier patient automatiquement
+        if (this.patients.length > 0) {
+          console.log('Auto-sélection du premier patient');
+          setTimeout(() => this.selectPatient('0'), 100);
+        } else {
+          console.warn('⚠️ Aucun patient trouvé dans la base de données');
+        }
+      }),
       catchError(error => {
-        console.error('Erreur lors de la récupération des patients:', error);
+        console.error('✗ Erreur patients:', error);
+        this.patients = [];
         return of([]);
+      }),
+      finalize(() => {
+        this.loadingPatients = false;
+        console.log('👥 Chargement des patients terminé');
       })
-    ).subscribe(patients => {
-      this.patients = patients;
-      console.log(`Loaded ${this.patients.length} patients`);
-      
-      if (this.patients.length > 0) {
-        this.selectPatient('0');
-      }
-      
-      this.loading = false;
-    });
+    );
   }
 
   selectDoctor(doctorIndexStr: string): void {
     try {
+      console.log('🔍 Sélection du médecin:', doctorIndexStr);
+      
       const doctorIndex = parseInt(doctorIndexStr, 10);
       if (isNaN(doctorIndex) || doctorIndex < 0 || doctorIndex >= this.doctors.length) {
         console.warn('Index de médecin invalide:', doctorIndexStr);
@@ -127,19 +214,22 @@ export class AdminDashboardComponent implements OnInit {
       }
 
       const doctor = this.doctors[doctorIndex];
-      console.log('Médecin sélectionné:', doctor);
+      console.log('✓ Médecin sélectionné:', doctor);
       this.selectedDoctor = doctor;
 
+      // Charger les rendez-vous du médecin
       this.dashboardService.getDoctorAppointments(doctor.id).pipe(
-        tap(appointments => console.log('Doctor appointments received:', appointments)),
+        tap(appointments => {
+          console.log('✓ Rendez-vous du médecin récupérés:', appointments);
+        }),
         catchError(error => {
-          console.error(`Erreur lors de la récupération des rendez-vous du médecin ${doctor.id}:`, error);
+          console.error(`✗ Erreur rendez-vous médecin ${doctor.id}:`, error);
           return of([]);
         })
       ).subscribe(appointments => {
         if (this.selectedDoctor) {
           this.selectedDoctor.appointmentsPerDay = appointments;
-          this.renderDoctorChart();
+          setTimeout(() => this.renderDoctorChart(), 100);
         }
       });
     } catch (error) {
@@ -149,6 +239,8 @@ export class AdminDashboardComponent implements OnInit {
 
   selectPatient(patientIndexStr: string): void {
     try {
+      console.log('🔍 Sélection du patient:', patientIndexStr);
+      
       const patientIndex = parseInt(patientIndexStr, 10);
       if (isNaN(patientIndex) || patientIndex < 0 || patientIndex >= this.patients.length) {
         console.warn('Index de patient invalide:', patientIndexStr);
@@ -156,19 +248,21 @@ export class AdminDashboardComponent implements OnInit {
       }
 
       const patient = this.patients[patientIndex];
-      console.log('Patient sélectionné:', patient);
+      console.log('✓ Patient sélectionné:', patient);
       this.selectedPatient = patient;
 
       this.dashboardService.getPatientAppointments(patient.id).pipe(
-        tap(appointments => console.log('Patient appointments received:', appointments)),
+        tap(appointments => {
+          console.log('✓ Rendez-vous du patient récupérés:', appointments);
+        }),
         catchError(error => {
-          console.error(`Erreur lors de la récupération des rendez-vous du patient ${patient.id}:`, error);
+          console.error(`✗ Erreur rendez-vous patient ${patient.id}:`, error);
           return of([]);
         })
       ).subscribe(appointments => {
         if (this.selectedPatient) {
           this.selectedPatient.appointmentsPerMonth = appointments;
-          this.renderPatientChart();
+          setTimeout(() => this.renderPatientChart(), 100);
         }
       });
     } catch (error) {
@@ -195,7 +289,7 @@ export class AdminDashboardComponent implements OnInit {
     const labels = this.selectedDoctor.appointmentsPerDay.map(item => item.date);
     const data = this.selectedDoctor.appointmentsPerDay.map(item => item.count);
 
-    console.log('Création du graphique pour le médecin avec ces données:', { labels, data });
+    console.log('📊 Création du graphique médecin:', { labels, data });
 
     this.doctorChart = new Chart(ctx, {
       type: 'bar',
@@ -240,7 +334,7 @@ export class AdminDashboardComponent implements OnInit {
     const labels = this.selectedPatient.appointmentsPerMonth.map(item => item.month);
     const data = this.selectedPatient.appointmentsPerMonth.map(item => item.count);
 
-    console.log('Création du graphique pour le patient avec ces données:', { labels, data });
+    console.log('📊 Création du graphique patient:', { labels, data });
 
     this.patientChart = new Chart(ctx, {
       type: 'line',
@@ -268,6 +362,12 @@ export class AdminDashboardComponent implements OnInit {
     });
   }
 
+  // Méthode pour recharger manuellement les données
+  refreshData(): void {
+    console.log('🔄 Rechargement manuel des données');
+    this.fetchData();
+  }
+
   // Méthode de déconnexion
   logout(): void {
     this.authService.logout().subscribe({
@@ -277,8 +377,7 @@ export class AdminDashboardComponent implements OnInit {
       },
       error: (error) => {
         console.error('Erreur lors de la déconnexion', error);
-        // Même en cas d'erreur, on supprime les données locales et on redirige
-        this.authService.clearSession;
+        this.authService.clearSession();
         this.router.navigate(['/login']);
       }
     });
